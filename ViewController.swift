@@ -7,30 +7,52 @@
 //
 
 import UIKit
+var super_view = UIView();
 
 class ViewController: UIViewController {
     
     func pressed_loc(sender:Grid_loc!)
     {
-        var max:UInt32 = UInt32(NUM_ROWS * NUM_COLS);
-        var index = Int(arc4random_uniform(max));
-        if(sender.mine_exists)
+        if(sender.mine_exists)  // user lost game
         {
+            GAME_OVER = true;
             for(var i = 0; i < (NUM_ROWS * NUM_COLS); ++i)
             {
                 map[i].backgroundColor = UIColor.redColor();
-                println("GAME OVER");
+                if(map[i].mine_exists)
+                {
+                    map[i].mark_mine();
+                }
+            }
+            super_view.bringSubviewToFront(sender);
+            sender.layer.borderWidth = 5.0;
+        }
+        if(!sender.explored)
+        {
+            map[sender.tag].mark_explored();
+            
+            var max:UInt32 = UInt32(NUM_ROWS * NUM_COLS);
+            var index = Int(arc4random_uniform(max));
+            while((map[index].mine_exists) || (map[index].explored))
+            {
+                index = Int(arc4random_uniform(max));
+            }
+            map[index].mark_mine();
+        }
+        if(Grid_loc.won_game())
+        {
+            for(var i = 0; i < (NUM_ROWS * NUM_COLS); ++i)
+            {
+                map[i].backgroundColor = UIColor.orangeColor();
             }
         }
-        map[index].mark_mine();
-        map[sender.tag].backgroundColor = UIColor.blueColor();
     }
 
     override func viewDidLoad()
     {
         super.viewDidLoad()
         // Do any additional setup after loading the view, typically from a nib.
-        var super_view:UIView = self.view;
+        super_view = self.view;
         super_view.backgroundColor = UIColor.redColor();
         super_view.setTranslatesAutoresizingMaskIntoConstraints(false);
     
