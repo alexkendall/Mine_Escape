@@ -5,7 +5,6 @@
 //  Created by Alex Harrison on 3/20/15.
 //  Copyright (c) 2015 Alex Harrison. All rights reserved.
 //
-
 import UIKit
 var super_view = UIView();
 
@@ -19,16 +18,16 @@ class ViewController: UIViewController {
             for(var i = 0; i < (NUM_ROWS * NUM_COLS); ++i)
             {
                 map[i].timer.invalidate();
-                map[i].backgroundColor = UIColor.redColor();
                 if(map[i].mine_exists)
                 {
                     map[i].mark_mine();
+                    map[i].backgroundColor = UIColor.redColor();
                 }
             }
             super_view.bringSubviewToFront(sender);
             sender.layer.borderWidth = 5.0;
         }
-        if(!sender.explored)
+        else if(!sender.explored)
         {
             map[sender.tag].mark_explored();
             var neighbors = map[sender.tag].unmarked_neighbors();
@@ -42,10 +41,21 @@ class ViewController: UIViewController {
         }
         if(Mine_cell.won_game())
         {
-            for(var i = 0; i < (NUM_ROWS * NUM_COLS); ++i)
+            for(var i = NUM_LOCS - 1; i >= 0; --i)
             {
-                map[i].backgroundColor = UIColor.orangeColor();
-                map[i].setTitleColor(UIColor.clearColor(), forState: UIControlState.Normal);
+                if(!map[i].mine_exists)
+                {
+                    //map[i].backgroundColor = UIColor.orangeColor();
+                    super_view.sendSubviewToBack(map[i]);
+                    map[i].layer.borderWidth = 1.0;
+                }
+                else
+                {
+                    map[i].mark_mine();
+                    map[i].backgroundColor = UIColor.redColor();
+                    map[i].layer.borderWidth = 1.0;
+                    super_view.sendSubviewToBack(map[i]);
+                }
                 map[i].timer.invalidate();
             }
         }
@@ -56,7 +66,7 @@ class ViewController: UIViewController {
         super.viewDidLoad()
         // Do any additional setup after loading the view, typically from a nib.
         super_view = self.view;
-        super_view.backgroundColor = UIColor.redColor();
+        super_view.backgroundColor = UIColor.blackColor(); // hide date and time
         super_view.setTranslatesAutoresizingMaskIntoConstraints(false);
     
         var size:Float = 1.0;
@@ -97,6 +107,8 @@ class ViewController: UIViewController {
                 map.append(subview);
             }
         }
+        super_view.layer.borderWidth = 2.0;
+        super_view.layer.borderColor = UIColor.blackColor().CGColor;
     }
     override func didReceiveMemoryWarning() {
         super.didReceiveMemoryWarning()
