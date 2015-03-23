@@ -49,13 +49,7 @@ class Grid_loc:UIButton
         {
             --time_til_disappears;
         }
-        else if(GAME_OVER)
-        {
-            timer.invalidate();
-            timer_running = false;
-            println("Game Over");
-        }
-        else    // make mine disappear
+        else    // remove mine indicator
         {
             timer.invalidate();
             setTitleColor(UIColor.clearColor(), forState: UIControlState.Normal);
@@ -71,7 +65,7 @@ class Grid_loc:UIButton
         titleLabel?.font = UIFont(name: "Arial-BoldMT" , size: 30.0);
         ++COUNT;
         
-        if(timer_running == false)
+        if((timer_running == false) && (!GAME_OVER))
         {
             time_til_disappears = 1;
             timer = NSTimer.scheduledTimerWithTimeInterval(1, target: self, selector: "update", userInfo: nil, repeats: true);

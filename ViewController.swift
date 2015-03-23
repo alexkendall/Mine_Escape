@@ -18,6 +18,7 @@ class ViewController: UIViewController {
             GAME_OVER = true;
             for(var i = 0; i < (NUM_ROWS * NUM_COLS); ++i)
             {
+                map[i].timer.invalidate();
                 map[i].backgroundColor = UIColor.redColor();
                 if(map[i].mine_exists)
                 {
@@ -44,6 +45,8 @@ class ViewController: UIViewController {
             for(var i = 0; i < (NUM_ROWS * NUM_COLS); ++i)
             {
                 map[i].backgroundColor = UIColor.orangeColor();
+                map[i].setTitleColor(UIColor.clearColor(), forState: UIControlState.Normal);
+                map[i].timer.invalidate();
             }
         }
     }
