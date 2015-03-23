@@ -11,7 +11,7 @@ var super_view = UIView();
 
 class ViewController: UIViewController {
     
-    func pressed_loc(sender:Grid_loc!)
+    func pressed_loc(sender:Mine_cell!)
     {
         if(sender.mine_exists)  // user lost game
         {
@@ -31,16 +31,16 @@ class ViewController: UIViewController {
         if(!sender.explored)
         {
             map[sender.tag].mark_explored();
-            
-            var max:UInt32 = UInt32(NUM_ROWS * NUM_COLS);
-            var index = Int(arc4random_uniform(max));
-            while((map[index].mine_exists) || (map[index].explored))
+            var neighbors = map[sender.tag].unmarked_neighbors();
+            if((neighbors.count > 0) && ((NUM_LOCS - COUNT) > 1))
             {
-                index = Int(arc4random_uniform(max));
+                var temp_index:Int = Int(arc4random_uniform(UInt32(neighbors.count)));
+                var index = neighbors[temp_index];
+                map[index].mark_mine();
             }
-            map[index].mark_mine();
+
         }
-        if(Grid_loc.won_game())
+        if(Mine_cell.won_game())
         {
             for(var i = 0; i < (NUM_ROWS * NUM_COLS); ++i)
             {
@@ -68,7 +68,8 @@ class ViewController: UIViewController {
                 var width_const:CGFloat = CGFloat(1.0 / CGFloat(NUM_COLS));
                 var height_const:CGFloat = CGFloat(1.0 / CGFloat(NUM_ROWS));
                 
-                var subview:Grid_loc = Grid_loc();
+                var loc = (row * NUM_COLS) + col;
+                var subview:Mine_cell = Mine_cell(location_identifier:loc);
                 subview.setTranslatesAutoresizingMaskIntoConstraints(false);
                 
                 var width = NSLayoutConstraint(item: subview, attribute: NSLayoutAttribute.Width, relatedBy: NSLayoutRelation.Equal, toItem: super_view, attribute: NSLayoutAttribute.Width, multiplier: width_const, constant: 0.0);
