@@ -1,10 +1,12 @@
 import UIKit
-let NUM_ROWS:Int = 5;
-let NUM_COLS:Int = 4;
+let NUM_ROWS:Int = 7;
+let NUM_COLS:Int = 5;
 let NUM_LOCS = NUM_ROWS * NUM_COLS;
 let TOP_BORDER:CGFloat = 20.0;
 var COUNT:Int = 0;
 var GAME_OVER:Bool = false;
+var GAME_STARTED = false;
+var START_LOC = Int(floor(Float(NUM_LOCS) / 2.0));
 
 var map = Array<Mine_cell>();
 
@@ -62,6 +64,19 @@ class Mine_cell:UIButton
         if(time_til_disappears > 0)
         {
             --time_til_disappears;
+            switch time_til_disappears
+            {
+            case 3:
+                setTitleColor(UIColor.redColor(), forState: UIControlState.Normal);
+            case 2:
+                setTitleColor(UIColor.orangeColor(), forState: UIControlState.Normal);
+            case 1:
+                setTitleColor(UIColor.yellowColor(), forState: UIControlState.Normal);
+            case 0:
+                setTitleColor(UIColor.clearColor(), forState: UIControlState.Normal);
+            default:
+                setTitleColor(UIColor.blackColor(), forState: UIControlState.Normal);
+            }
         }
         else    // remove mine indicator
         {
@@ -81,8 +96,8 @@ class Mine_cell:UIButton
         
         if((timer_running == false) && (!GAME_OVER))
         {
-            time_til_disappears = 1;
-            timer = NSTimer.scheduledTimerWithTimeInterval(0.5, target: self, selector: "update", userInfo: nil, repeats: true);
+            time_til_disappears = 4;
+            timer = NSTimer.scheduledTimerWithTimeInterval(2.0, target: self, selector: "update", userInfo: nil, repeats: true);
             timer_running = true;
         }
     }

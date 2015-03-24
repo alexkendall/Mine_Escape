@@ -4,7 +4,7 @@
 //
 //  Created by Alex Harrison on 3/20/15.
 //  Copyright (c) 2015 Alex Harrison. All rights reserved.
-//
+//®
 import UIKit
 var super_view = UIView();
 
@@ -12,6 +12,17 @@ class ViewController: UIViewController {
     
     func pressed_loc(sender:Mine_cell!)
     {
+        if(!GAME_STARTED)
+        {
+            if(sender.loc_id == START_LOC)
+            {
+                map[START_LOC].setTitleColor(UIColor.clearColor(), forState: UIControlState.Normal);
+                GAME_STARTED = true;
+            }
+        }
+        
+        if(GAME_STARTED)
+        {
         if(sender.mine_exists)  // user lost game
         {
             GAME_OVER = true;
@@ -58,6 +69,7 @@ class ViewController: UIViewController {
                 }
                 map[i].timer.invalidate();
             }
+        }
         }
     }
 
@@ -107,6 +119,11 @@ class ViewController: UIViewController {
                 map.append(subview);
             }
         }
+        map[START_LOC].backgroundColor = UIColor.grayColor();
+        map[START_LOC].setTitleColor(UIColor.blackColor(), forState: UIControlState.Normal);
+        map[START_LOC].setTitle("START", forState: UIControlState.Normal);
+        map[START_LOC].titleLabel?.font = UIFont(name: "Arial-BoldMT" , size: 15.0);
+        
         super_view.layer.borderWidth = 2.0;
         super_view.layer.borderColor = UIColor.blackColor().CGColor;
     }
