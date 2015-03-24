@@ -1,4 +1,17 @@
+//
+//  ViewController.swift
+//  MineEscape
+//
+//  Created by Alex Harrison on 3/20/15.
+//  Copyright (c) 2015 Alex Harrison. All rights reserved.
+//®
+
+//-------------------------------------------------------------------------
+
 import UIKit
+
+//-------------------------------------------------------------------------
+// GLOBAL VARIABLES
 let NUM_ROWS:Int = 7;
 let NUM_COLS:Int = 5;
 let NUM_LOCS = NUM_ROWS * NUM_COLS;
@@ -7,10 +20,17 @@ var COUNT:Int = 0;
 var GAME_OVER:Bool = false;
 var GAME_STARTED = false;
 var START_LOC = Int(floor(Float(NUM_LOCS) / 2.0));
-
 var map = Array<Mine_cell>();
 
+// colors
+let LIGHT_BLUE = UIColor(red: 0.0, green: 0.8, blue: 1.0, alpha: 1.0);
+let DARK_BLUE = UIColor(red: 0.0, green: 0.0, blue: 0.3, alpha: 1.0);
+
+//SPEED
+enum SPEED{case SLOW, MED, FAST};
+
 //-------------------------------------------------------------------------
+
 class Mine_cell:UIButton
 {
     var loc_id:Int;
@@ -20,6 +40,7 @@ class Mine_cell:UIButton
     var time_til_disappears:Int = 0;
     var timer = NSTimer();
     var timer_running:Bool = false;
+    var speed:SPEED;
     
     override init()
     {
@@ -28,6 +49,7 @@ class Mine_cell:UIButton
         insignia = "";
         explored = false;
         timer_running = false;
+        speed = SPEED.SLOW;
         super.init();
     }
     required init(coder aDecoder: NSCoder) {
@@ -35,6 +57,7 @@ class Mine_cell:UIButton
         mine_exists = false;
         insignia = "";
         explored = false;
+        speed = SPEED.SLOW;
         super.init();
     }
     override init(frame: CGRect) {
@@ -43,6 +66,7 @@ class Mine_cell:UIButton
         mine_exists = false;
         insignia = "";
         timer_running = false;
+        speed = SPEED.SLOW;
         super.init(frame: frame);
     }
     init(location_identifier:Int)
@@ -52,6 +76,7 @@ class Mine_cell:UIButton
         mine_exists = false;
         insignia = "";
         timer_running = false;
+        speed = SPEED.SLOW;
         super.init();
         loc_id = location_identifier;
     }
@@ -64,18 +89,37 @@ class Mine_cell:UIButton
         if(time_til_disappears > 0)
         {
             --time_til_disappears;
-            switch time_til_disappears
+            if(speed == SPEED.SLOW)
             {
-            case 3:
-                setTitleColor(UIColor.redColor(), forState: UIControlState.Normal);
-            case 2:
-                setTitleColor(UIColor.orangeColor(), forState: UIControlState.Normal);
-            case 1:
-                setTitleColor(UIColor.yellowColor(), forState: UIControlState.Normal);
-            case 0:
-                setTitleColor(UIColor.clearColor(), forState: UIControlState.Normal);
-            default:
-                setTitleColor(UIColor.blackColor(), forState: UIControlState.Normal);
+                switch time_til_disappears
+                {
+                case 3:
+                    setTitleColor(UIColor.redColor(), forState: UIControlState.Normal);
+                case 2:
+                    setTitleColor(UIColor.orangeColor(), forState: UIControlState.Normal);
+                case 1:
+                    setTitleColor(UIColor.yellowColor(), forState: UIControlState.Normal);
+                case 0:
+                    setTitleColor(UIColor.clearColor(), forState: UIControlState.Normal);
+                default:
+                    setTitleColor(UIColor.blackColor(), forState: UIControlState.Normal);
+                }
+            }
+            else if(speed == SPEED.MED)
+            {
+                switch time_til_disappears
+                {
+                case 3:
+                    setTitleColor(DARK_BLUE, forState: UIControlState.Normal);
+                case 2:
+                    setTitleColor(UIColor.blueColor(), forState: UIControlState.Normal);
+                case 1:
+                    setTitleColor(LIGHT_BLUE, forState: UIControlState.Normal);
+                case 0:
+                    setTitleColor(UIColor.clearColor(), forState: UIControlState.Normal);
+                default:
+                    setTitleColor(UIColor.blackColor(), forState: UIControlState.Normal);
+                }
             }
         }
         else    // remove mine indicator
@@ -96,9 +140,22 @@ class Mine_cell:UIButton
         
         if((timer_running == false) && (!GAME_OVER))
         {
-            time_til_disappears = 4;
-            timer = NSTimer.scheduledTimerWithTimeInterval(2.0, target: self, selector: "update", userInfo: nil, repeats: true);
-            timer_running = true;
+            if(speed == SPEED.SLOW)
+            {
+                time_til_disappears = 4;
+                timer = NSTimer.scheduledTimerWithTimeInterval(2.0, target: self, selector: "update", userInfo: nil, repeats: true);
+                timer_running = true;
+            }
+            else if(speed == SPEED.MED)
+            {
+                time_til_disappears = 4;
+                timer = NSTimer.scheduledTimerWithTimeInterval(0.5, target: self, selector: "update", userInfo: nil, repeats: true);
+                timer_running = true;
+            }
+            else
+            {
+                
+            }
         }
     }
     func mark_explored()

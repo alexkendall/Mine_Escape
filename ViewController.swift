@@ -46,7 +46,15 @@ class ViewController: UIViewController {
             {
                 var temp_index:Int = Int(arc4random_uniform(UInt32(neighbors.count)));
                 var index = neighbors[temp_index];
-                map[index].mark_mine();
+                if((temp_index % 2) == 1)
+                {
+                    map[index].speed = SPEED.MED;
+                    map[index].mark_mine();
+                }
+                else
+                {
+                    map[index].mark_mine();
+                }
             }
 
         }

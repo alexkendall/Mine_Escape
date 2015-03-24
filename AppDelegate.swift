@@ -1,11 +1,10 @@
 //
-//  AppDelegate.swift
+//  ViewController.swift
 //  MineEscape
 //
 //  Created by Alex Harrison on 3/20/15.
 //  Copyright (c) 2015 Alex Harrison. All rights reserved.
-//
-
+//®
 import UIKit
 
 @UIApplicationMain
