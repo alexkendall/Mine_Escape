@@ -173,6 +173,7 @@ class GameMap
     var GAME_OVER:Bool = false;
     var START_LOC:Int;
     var GAME_STARTED:Bool;
+    var size_buttons = Array<UIButton>();
     
     func create_game(rows:Int, cols:Int)
     {
@@ -231,7 +232,15 @@ class GameMap
         self.map[self.START_LOC].backgroundColor = UIColor.grayColor();
         self.map[self.START_LOC].setTitleColor(UIColor.blackColor(), forState: UIControlState.Normal);
         self.map[self.START_LOC].setTitle("START", forState: UIControlState.Normal);
-        self.map[self.START_LOC].titleLabel?.font = UIFont(name: "Arial-BoldMT" , size: 15.0);
+        
+        if(DIM == 7)
+        {
+            self.map[self.START_LOC].titleLabel?.font = UIFont(name: "Arial-BoldMT" , size: 10.0);
+        }
+        else
+        {
+            self.map[self.START_LOC].titleLabel?.font = UIFont(name: "Arial-BoldMT" , size: 15.0);
+        }
         super_view.layer.borderWidth = 2.0;
         super_view.layer.borderColor = UIColor.blackColor().CGColor
         
@@ -259,6 +268,30 @@ class GameMap
         super_view.addConstraint(offset_x);
         super_view.addConstraint(offset_y);
         new_game_button.setTitle("NEW GAME", forState: UIControlState.Normal);
+        
+        for(var i = 0; i < 3; ++i)
+        {
+            var size_button = UIButton();
+            size_button.setTranslatesAutoresizingMaskIntoConstraints(false);
+            super_view.addSubview(size_button);
+            
+            var off_const:CGFloat = 170.0 + (40.0 * CGFloat(i));
+            
+            var csy = NSLayoutConstraint(item: size_button, attribute: NSLayoutAttribute.CenterY, relatedBy: NSLayoutRelation.Equal, toItem: new_game_button, attribute: NSLayoutAttribute.CenterY, multiplier: 1.0, constant: 0.0);
+            
+            
+            var offset_left = NSLayoutConstraint(item: size_button, attribute: NSLayoutAttribute.Left, relatedBy: NSLayoutRelation.Equal, toItem: new_game_button, attribute: NSLayoutAttribute.Left, multiplier: 1.0, constant: off_const);
+            
+            var num = 3 + (2*i);
+            var dim_str = String(format: "%ix%i", num, num);
+            size_button.setTitle(dim_str, forState: UIControlState.Normal);
+            size_button.setTitleColor(UIColor.whiteColor(), forState: UIControlState.Normal);
+            size_button.tag = num;
+            
+            super_view.addConstraint(offset_left);
+            super_view.addConstraint(csy);
+            size_buttons.append(size_button);
+        }
     }
     
     init()

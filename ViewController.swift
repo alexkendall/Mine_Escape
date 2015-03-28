@@ -8,6 +8,7 @@
 import UIKit
 var super_view = UIView();
 var game:GameMap = GameMap();
+var DIM:Int = 5;
 
 class ViewController: UIViewController {
 
@@ -21,6 +22,15 @@ class ViewController: UIViewController {
         game.bottom_text.text = "";
         viewDidLoad();
     }
+    func set_dimension(sender:UIButton!)
+    {
+        for(var i = 0; i < 3; ++i)
+        {
+            game.size_buttons[i].setTitleColor(UIColor.whiteColor(), forState: UIControlState.Normal);
+        }
+        sender.setTitleColor(LIGHT_BLUE, forState: UIControlState.Normal);
+        DIM = sender.tag;
+    }
 
     override func viewDidLoad()
     {
@@ -30,12 +40,20 @@ class ViewController: UIViewController {
         super_view.backgroundColor = UIColor.blackColor(); // hide date and time
         super_view.setTranslatesAutoresizingMaskIntoConstraints(false);
         
-        game = GameMap(num_rows: 5, num_cols: 5);
+        game = GameMap(num_rows: DIM, num_cols:DIM);
         for(var i = 0; i < game.NUM_LOCS; ++i)
         {
             game.map[i].addTarget(self, action: "pressed_loc:", forControlEvents: UIControlEvents.TouchDown);
         }
         game.new_game_button.addTarget(self, action: "reset", forControlEvents: UIControlEvents.TouchDown);
+        for(var i = 0; i < 3; ++i)
+        {
+            game.size_buttons[i].addTarget(self, action: "set_dimension:", forControlEvents: UIControlEvents.TouchDown);
+            if(game.size_buttons[i].tag == DIM)
+            {
+                game.size_buttons[i].setTitleColor(LIGHT_BLUE, forState: UIControlState.Normal);
+            }
+        }
     }
     override func didReceiveMemoryWarning() {
         super.didReceiveMemoryWarning()
