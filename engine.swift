@@ -23,6 +23,8 @@ let BLUE = UIColor.blueColor();
 //SPEED
 enum SPEED{case SLOW, FAST};
 
+let NUM_SPEEDS:Int = 10;
+
 //-------------------------------------------------------------------------
 // CLASS THAT HOLDS DATA FOR EACH MINE CELL
 
@@ -417,6 +419,59 @@ class GameMap
         return arr;
     }
     
+    // REQUIRES: SPEED IS FROM 0-10
+    // generates mines based on policy
+    func generate_mines(policy:MINE_POLICY, speed:Int, loc_id:Int)
+    {
+        var speed_pool = Array<SPEED>();
+        let num_slow = 10 - speed;
+        let num_fast = speed;
+        
+        for(var i = 0; i < num_slow; ++i)
+        {
+            speed_pool.append(SPEED.SLOW);
+        }
+        for(var i = 0; i < num_fast; ++i)
+        {
+            speed_pool.append(SPEED.FAST);
+        }
+        // get random speed out of distribution of those generated
+        var speed_index = arc4random_uniform(10);
+        var mine_speed = speed_pool[Int(speed_index)];
+        
+        //
+        var local_unmarked = unmarked_neighbors(loc_id);
+        var global_unmarked = unmarked_global();
+        
+        if((policy == MINE_POLICY.LOCAL) && (local_unmarked.count > 0) )
+        {
+            var temp_index = Int(arc4random_uniform(UInt32(local_unmarked.count)));
+            var index = local_unmarked[temp_index];
+            map[index].speed = mine_speed;
+            mark_mine(index);
+        }
+        else if((policy == MINE_POLICY.GLOBAL) && (global_unmarked.count > 0))
+        {
+            var temp_index = Int(arc4random_uniform(UInt32(global_unmarked.count)));
+            var index = global_unmarked[temp_index];
+            map[index].speed = mine_speed;
+            mark_mine(index);
+        }
+        else    // MIXED policy
+        {
+            // generate random number from 0-1, and chose mine speed on 50/50 distribution
+            var rand_num = arc4random_uniform(2); // can be either 0 or 1
+            if(rand_num == 0)
+            {
+                generate_mines(MINE_POLICY.LOCAL, speed: speed, loc_id: loc_id);
+            }
+            else
+            {
+                generate_mines(MINE_POLICY.GLOBAL, speed: speed, loc_id: loc_id);
+            }
+        }
+    }
+    
     func mark_location(var loc_id:Int)
     {
         if(GAME_STARTED == false)
@@ -456,7 +511,13 @@ class GameMap
                     end_game();
                 }
             }
+            if(!GAME_OVER)
+            {
+                generate_mines(MINE_POLICY.LOCAL, speed: 0, loc_id: loc_id);
+            }
+            
             // generate mines
+            /*
             if(((NUM_LOCS - COUNT) > 1) && !GAME_OVER)
             {
                 var local_neighbors = unmarked_neighbors(loc_id);
@@ -496,6 +557,8 @@ class GameMap
                     }
                 }
             }
+            */
+            // end generate mines
         }
     }
 }
