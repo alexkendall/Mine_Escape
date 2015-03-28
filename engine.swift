@@ -164,6 +164,8 @@ class Mine_cell:UIButton
 class GameMap
 {
     var map = Array<Mine_cell>();
+    var new_game_button = UIButton();
+    var bottom_text = UILabel();
     var NUM_ROWS:Int;
     var NUM_COLS:Int;
     var NUM_LOCS:Int;
@@ -232,6 +234,31 @@ class GameMap
         self.map[self.START_LOC].titleLabel?.font = UIFont(name: "Arial-BoldMT" , size: 15.0);
         super_view.layer.borderWidth = 2.0;
         super_view.layer.borderColor = UIColor.blackColor().CGColor
+        
+        self.bottom_text.setTranslatesAutoresizingMaskIntoConstraints(false);
+        var center_x = NSLayoutConstraint(item: bottom_text, attribute: NSLayoutAttribute.CenterX, relatedBy: NSLayoutRelation.Equal, toItem: super_view, attribute: NSLayoutAttribute.CenterX, multiplier: 1.0, constant: 0.0);
+        
+        var center_y_const = (super_view.bounds.width + super_view.bounds.height) / 2.0;
+        var center_y = NSLayoutConstraint(item: bottom_text, attribute: NSLayoutAttribute.CenterY, relatedBy: NSLayoutRelation.Equal, toItem: super_view, attribute: NSLayoutAttribute.Top, multiplier: 1.0, constant: center_y_const);
+        
+        super_view.addSubview(self.bottom_text);
+        super_view.addConstraint(center_x);
+        super_view.addConstraint(center_y);
+        
+        self.bottom_text.textColor = UIColor.whiteColor();
+        self.bottom_text.textAlignment = NSTextAlignment.Center;
+        self.bottom_text.font = UIFont(name: "Arial-BoldMT" , size: 35.0);
+        
+        self.new_game_button.setTranslatesAutoresizingMaskIntoConstraints(false);
+        self.new_game_button.setTitleColor(UIColor.whiteColor(), forState: UIControlState.Normal);
+        var offset_x = NSLayoutConstraint(item: new_game_button, attribute: NSLayoutAttribute.Left, relatedBy: NSLayoutRelation.Equal, toItem: super_view, attribute: NSLayoutAttribute.Left, multiplier: 1.0, constant: 20.0);
+        
+        var offset_y = NSLayoutConstraint(item: new_game_button, attribute: NSLayoutAttribute.Bottom, relatedBy: NSLayoutRelation.Equal, toItem: super_view, attribute: NSLayoutAttribute.Bottom, multiplier: 1.0, constant: -15.0);
+        
+        super_view.addSubview(new_game_button);
+        super_view.addConstraint(offset_x);
+        super_view.addConstraint(offset_y);
+        new_game_button.setTitle("NEW GAME", forState: UIControlState.Normal);
     }
     
     init()
@@ -321,7 +348,6 @@ class GameMap
         map[loc_id].mark_mine();
         map[loc_id].mine_exists = true;
         ++COUNT;
-        //println(COUNT);
     }
     
     func end_game()
@@ -382,16 +408,17 @@ class GameMap
                 map[loc_id].layer.borderWidth = 1.0;
                 map[loc_id].layer.borderColor = UIColor.whiteColor().CGColor;
                 map[loc_id].set_image("mine_white");
-                println("You Lost! Game over...\n");
+                self.bottom_text.text = "YOU LOST!";
+                self.bottom_text.textColor = UIColor.redColor();
             }
             else if(!map[loc_id].explored)
             {
                 map[loc_id].mark_explored();
                 ++COUNT;
-                //println(COUNT);
                 if(won_game())
                 {
-                    println("You Won The game\n");
+                    self.bottom_text.text = "YOU WIN!";
+                    self.bottom_text.textColor = LIGHT_BLUE;
                     GAME_OVER = true;
                     end_game();
                 }
