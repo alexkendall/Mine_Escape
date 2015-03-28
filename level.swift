@@ -11,30 +11,34 @@ enum MINE_POLICY{case LOCAL, GLOBAL, MIXED};
 
 class Level:UIButton
 {
+    var level:Int;
     var speed:Int;
     var policy:MINE_POLICY;
     override init()
     {
-        speed = 0;
-        policy = MINE_POLICY.LOCAL;
+        self.level = 0;
+        self.speed = 0;
+        self.policy = MINE_POLICY.LOCAL;
+        
         super.init();
     }
-    required init(coder aDecoder: NSCoder)
-    {
-        speed = 0;
-        policy = MINE_POLICY.LOCAL;
+    required init(coder aDecoder: NSCoder) {
+        self.level = 0;
+        self.speed = 0;
+        self.policy = MINE_POLICY.LOCAL;
         super.init();
     }
-    override init(frame: CGRect)
-    {
-        speed = 0;
-        policy = MINE_POLICY.LOCAL;
+    override init(frame: CGRect) {
+        self.level = 0;
+        self.speed = 0;
+        self.policy = MINE_POLICY.LOCAL;
         super.init();
     }
-    init(in_speed:Int, in_policy:MINE_POLICY)
+    init(in_level:Int, in_speed:Int, in_policy:MINE_POLICY)
     {
-        speed = in_speed;
-        policy = in_policy;
+        self.level = in_level;
+        self.speed = in_speed;
+        self.policy = in_policy;
         super.init();
     }
 }

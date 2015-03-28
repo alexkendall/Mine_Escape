@@ -176,6 +176,7 @@ class GameMap
     var START_LOC:Int;
     var GAME_STARTED:Bool;
     var size_buttons = Array<UIButton>();
+    var MENU_button = UIButton();
     
     func create_game(rows:Int, cols:Int)
     {
@@ -203,8 +204,6 @@ class GameMap
                 subview.setTranslatesAutoresizingMaskIntoConstraints(false);
                 
                 var width = NSLayoutConstraint(item: subview, attribute: NSLayoutAttribute.Width, relatedBy: NSLayoutRelation.Equal, toItem: super_view, attribute: NSLayoutAttribute.Width, multiplier: width_const, constant: 0.0);
-                
-                //var height = NSLayoutConstraint(item: subview, attribute: NSLayoutAttribute.Height, relatedBy: NSLayoutRelation.Equal, toItem: super_view, attribute: NSLayoutAttribute.Height, multiplier: height_const, constant: 0.0);
                 
                 var height = NSLayoutConstraint(item: subview, attribute: NSLayoutAttribute.Height, relatedBy: NSLayoutRelation.Equal, toItem: subview, attribute: NSLayoutAttribute.Width, multiplier: 1.0, constant: 0.0);
     
@@ -270,6 +269,20 @@ class GameMap
         super_view.addConstraint(offset_x);
         super_view.addConstraint(offset_y);
         new_game_button.setTitle("NEW GAME", forState: UIControlState.Normal);
+    
+        
+        MENU_button.setTranslatesAutoresizingMaskIntoConstraints(false);
+        MENU_button.setTitle("MENU", forState: UIControlState.Normal);
+        MENU_button.setTitleColor(UIColor.whiteColor(), forState: UIControlState.Normal);
+        super_view.addSubview(MENU_button);
+        
+        var menu_offset_x = NSLayoutConstraint(item: MENU_button, attribute: NSLayoutAttribute.Left, relatedBy: NSLayoutRelation.Equal, toItem: super_view, attribute: NSLayoutAttribute.Left, multiplier: 1.0, constant: 20.0);
+        
+        var offsety_menu = NSLayoutConstraint(item: MENU_button, attribute: NSLayoutAttribute.CenterY, relatedBy: NSLayoutRelation.Equal, toItem: new_game_button, attribute: NSLayoutAttribute.CenterY, multiplier: 1.0, constant: -20.0);
+        
+        super_view.addConstraint(menu_offset_x);
+        super_view.addConstraint(offsety_menu);
+        
         
         for(var i = 0; i < 3; ++i)
         {
@@ -419,7 +432,7 @@ class GameMap
         return arr;
     }
     
-    // REQUIRES: SPEED IS FROM 0-10
+    // REQUIRES: SPEED IS WITHIN [0-10]
     // generates mines based on policy
     func generate_mines(policy:MINE_POLICY, speed:Int, loc_id:Int)
     {
@@ -513,52 +526,8 @@ class GameMap
             }
             if(!GAME_OVER)
             {
-                generate_mines(MINE_POLICY.LOCAL, speed: 0, loc_id: loc_id);
+                generate_mines(MINE_POLICY.MIXED, speed: 7, loc_id: loc_id);
             }
-            
-            // generate mines
-            /*
-            if(((NUM_LOCS - COUNT) > 1) && !GAME_OVER)
-            {
-                var local_neighbors = unmarked_neighbors(loc_id);
-                var global_neighbors = unmarked_global();
-                
-                if(local_neighbors.count > 0)
-                {
-                    var local_temp:Int = Int(arc4random_uniform(UInt32(local_neighbors.count)));
-                    var local_index = local_neighbors[local_temp];
-                    var global_temp:Int = Int(arc4random_uniform(UInt32(global_neighbors.count)));
-                    var global_index:Int = global_neighbors[global_temp];
-                    
-                    var rand_indx:Int = Int(arc4random_uniform(UInt32(global_neighbors.count)));
-                    
-                    var mod_nums_array = [0,1];
-                    var rand_mod:Int = Int(arc4random_uniform(UInt32(mod_nums_array.count)));
-                    var mod_num = mod_nums_array[rand_mod];
-                    
-                    if((local_index % 2) == mod_num)
-                    {
-                        if((rand_indx % 2 == mod_num))
-                        {
-                            map[local_index].speed = SPEED.FAST;
-                        }
-                        mark_mine(local_index);
-                    }
-                    
-                    else
-                    {
-                        map[global_index].speed = SPEED.FAST;
-                        mark_mine(global_index);
-                        
-                        if((rand_indx % 2 == mod_num))
-                        {
-                            map[global_index].speed = SPEED.FAST;
-                        }
-                    }
-                }
-            }
-            */
-            // end generate mines
         }
     }
 }

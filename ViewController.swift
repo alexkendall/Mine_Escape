@@ -9,9 +9,14 @@ import UIKit
 var super_view = UIView();
 var game:GameMap = GameMap();
 var DIM:Int = 5;
+var menu:Menu = Menu();
 
 class ViewController: UIViewController {
 
+    override func prefersStatusBarHidden() -> Bool {
+        return true;
+    }
+    
     func pressed_loc(sender:Mine_cell!)
     {
         game.mark_location(sender.loc_id);
@@ -21,6 +26,10 @@ class ViewController: UIViewController {
     {
         game.bottom_text.text = "";
         viewDidLoad();
+    }
+    func enter_menu()
+    {
+        menu.createMenu();
     }
     func set_dimension(sender:UIButton!)
     {
@@ -45,7 +54,10 @@ class ViewController: UIViewController {
         {
             game.map[i].addTarget(self, action: "pressed_loc:", forControlEvents: UIControlEvents.TouchDown);
         }
+        
         game.new_game_button.addTarget(self, action: "reset", forControlEvents: UIControlEvents.TouchDown);
+        game.MENU_button.addTarget(self, action: "enter_menu", forControlEvents: UIControlEvents.TouchDown);
+        
         for(var i = 0; i < 3; ++i)
         {
             game.size_buttons[i].addTarget(self, action: "set_dimension:", forControlEvents: UIControlEvents.TouchDown);
