@@ -41,10 +41,29 @@ class Menu
     var buttons:Array<menu_button> = Array<menu_button>();
     var tabs = Array<UILabel>();
     var background = UIView();
+    
     init()
     {
         
     }
+    
+    func removeMenu()
+    {
+        for(var i = 0; i < buttons.count; ++i)
+        {
+            buttons[i].removeFromSuperview();
+        }
+        buttons.removeAll(keepCapacity: true);
+        for(var i = 0; i < tabs.count; ++i)
+        {
+            tabs[i].removeFromSuperview();
+        }
+        tabs.removeAll(keepCapacity: true);
+        
+        background.removeFromSuperview();
+        
+    }
+    
     func createMenu()
     {
         background.setTranslatesAutoresizingMaskIntoConstraints(false);
@@ -103,7 +122,7 @@ class Menu
                 for(var col = 0; col < num_cols; ++col)
                 {
                     var level:Int = (row * num_cols) + col + 1;
-                    var subview = menu_button();
+                    var subview = menu_button(in_level: (num_cols * row) + col, in_progress: 0);
                     subview.backgroundColor = LIGHT_BLUE;
                     subview.setTranslatesAutoresizingMaskIntoConstraints(false);
                     subview.layer.borderWidth = 1.0;
@@ -124,15 +143,13 @@ class Menu
                     var center_x_constr = NSLayoutConstraint(item: subview, attribute: NSLayoutAttribute.CenterX, relatedBy: NSLayoutRelation.Equal, toItem: super_view, attribute: NSLayoutAttribute.Left, multiplier: 1.0, constant: center_x_const);
                     
                     super_view.addSubview(subview);
+                    buttons.append(subview);
                     super_view.addConstraint(width_sub_constr);
                     super_view.addConstraint(sub_height_constr);
                     super_view.addConstraint(center_y_constr);
                     super_view.addConstraint(center_x_constr);
-                    
-                    
                 }
             }
         }
-        
     }
 }

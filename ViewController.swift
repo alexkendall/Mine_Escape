@@ -8,8 +8,9 @@
 import UIKit
 var super_view = UIView();
 var game:GameMap = GameMap();
-var DIM:Int = 5;
+var DIM:Int = 3;
 var menu:Menu = Menu();
+var current_level = 0;
 
 class ViewController: UIViewController {
 
@@ -27,10 +28,26 @@ class ViewController: UIViewController {
         game.bottom_text.text = "";
         viewDidLoad();
     }
+    
+    func eneter_level(sender:menu_button!)
+    {
+        current_level = sender.level;
+        game.bottom_text.text = "";
+        menu.removeMenu();
+        viewDidLoad();
+    }
+    
     func enter_menu()
     {
         menu.createMenu();
+        for(var i = 0; i < menu.buttons.count; ++i)
+        {
+            menu.buttons[i].addTarget(self, action: "eneter_level:", forControlEvents: UIControlEvents.TouchDown);
+            menu.buttons[i].tag = i;
+            menu.buttons[i].level = i;
+        }
     }
+    
     func set_dimension(sender:UIButton!)
     {
         for(var i = 0; i < 3; ++i)
@@ -49,7 +66,9 @@ class ViewController: UIViewController {
         super_view.backgroundColor = UIColor.blackColor(); // hide date and time
         super_view.setTranslatesAutoresizingMaskIntoConstraints(false);
         
-        game = GameMap(num_rows: DIM, num_cols:DIM);
+        gen_levels();
+        game = GameMap(level: levels[current_level]);
+        DIM = levels[current_level].dimension;
         for(var i = 0; i < game.NUM_LOCS; ++i)
         {
             game.map[i].addTarget(self, action: "pressed_loc:", forControlEvents: UIControlEvents.TouchDown);
@@ -60,7 +79,7 @@ class ViewController: UIViewController {
         
         for(var i = 0; i < 3; ++i)
         {
-            game.size_buttons[i].addTarget(self, action: "set_dimension:", forControlEvents: UIControlEvents.TouchDown);
+            //game.size_buttons[i].addTarget(self, action: "set_dimension:", forControlEvents: UIControlEvents.TouchDown);
             if(game.size_buttons[i].tag == DIM)
             {
                 game.size_buttons[i].setTitleColor(LIGHT_BLUE, forState: UIControlState.Normal);

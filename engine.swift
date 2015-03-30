@@ -177,6 +177,10 @@ class GameMap
     var GAME_STARTED:Bool;
     var size_buttons = Array<UIButton>();
     var MENU_button = UIButton();
+    var MINE_SPEED:Int;
+    var POLICY:MINE_POLICY;
+    var level_indicator:UILabel = UILabel();
+    var level_no:Int = 0;
     
     func create_game(rows:Int, cols:Int)
     {
@@ -234,13 +238,17 @@ class GameMap
         self.map[self.START_LOC].setTitleColor(UIColor.blackColor(), forState: UIControlState.Normal);
         self.map[self.START_LOC].setTitle("START", forState: UIControlState.Normal);
         
-        if(DIM == 7)
+        if(NUM_ROWS == 7)
         {
             self.map[self.START_LOC].titleLabel?.font = UIFont(name: "Arial-BoldMT" , size: 10.0);
         }
-        else
+        else if(NUM_ROWS == 5)
         {
             self.map[self.START_LOC].titleLabel?.font = UIFont(name: "Arial-BoldMT" , size: 15.0);
+        }
+        else
+        {
+            self.map[self.START_LOC].titleLabel?.font = UIFont(name: "Arial-BoldMT" , size: 18.0);
         }
         super_view.layer.borderWidth = 2.0;
         super_view.layer.borderColor = UIColor.blackColor().CGColor
@@ -290,12 +298,12 @@ class GameMap
             size_button.setTranslatesAutoresizingMaskIntoConstraints(false);
             super_view.addSubview(size_button);
             
-            var off_const:CGFloat = 170.0 + (40.0 * CGFloat(i));
+            var off_const:CGFloat = 20.0 + (40.0 * CGFloat(i));
             
             var csy = NSLayoutConstraint(item: size_button, attribute: NSLayoutAttribute.CenterY, relatedBy: NSLayoutRelation.Equal, toItem: new_game_button, attribute: NSLayoutAttribute.CenterY, multiplier: 1.0, constant: 0.0);
             
             
-            var offset_left = NSLayoutConstraint(item: size_button, attribute: NSLayoutAttribute.Left, relatedBy: NSLayoutRelation.Equal, toItem: new_game_button, attribute: NSLayoutAttribute.Left, multiplier: 1.0, constant: off_const);
+            var offset_right = NSLayoutConstraint(item: size_button, attribute: NSLayoutAttribute.Right, relatedBy: NSLayoutRelation.Equal, toItem: super_view, attribute: NSLayoutAttribute.Right, multiplier: 1.0, constant: -off_const);
             
             var num = 3 + (2*i);
             var dim_str = String(format: "%ix%i", num, num);
@@ -303,12 +311,24 @@ class GameMap
             size_button.setTitleColor(UIColor.whiteColor(), forState: UIControlState.Normal);
             size_button.tag = num;
             
-            super_view.addConstraint(offset_left);
+            super_view.addConstraint(offset_right);
             super_view.addConstraint(csy);
             size_buttons.append(size_button);
         }
+        
+        level_indicator.setTranslatesAutoresizingMaskIntoConstraints(false);
+        super_view.addSubview(level_indicator);
+        
+        var centery_li = NSLayoutConstraint(item: level_indicator, attribute: NSLayoutAttribute.CenterY, relatedBy: NSLayoutRelation.Equal, toItem: MENU_button, attribute: NSLayoutAttribute.CenterY, multiplier: 1.0, constant: 0.0);
+        
+        var offset_rightli = NSLayoutConstraint(item: level_indicator, attribute: NSLayoutAttribute.Right, relatedBy: NSLayoutRelation.Equal, toItem: size_buttons[0], attribute: NSLayoutAttribute.Right, multiplier: 1.0, constant: 0.0);
+        
+        super_view.addConstraint(centery_li);
+        super_view.addConstraint(offset_rightli);
+        //level_indicator.text = String(format:"LEVEL %i", current_level);
+        level_indicator.textColor = UIColor.whiteColor();
+
     }
-    
     init()
     {
         NUM_ROWS = 4;
@@ -317,6 +337,8 @@ class GameMap
         NUM_LOCS = 24;
         START_LOC = Int(floor(Float(NUM_LOCS) / 2.0));
         GAME_STARTED = false;
+        self.MINE_SPEED = 5;
+        self.POLICY = MINE_POLICY.MIXED;
     }
     init(num_rows:Int, num_cols:Int)
     {
@@ -328,8 +350,25 @@ class GameMap
         NUM_LOCS = num_rows * num_cols;
         START_LOC = Int(floor(Float(NUM_LOCS) / 2.0));
         GAME_STARTED = false;
+        self.MINE_SPEED = 5;
+        self.POLICY = MINE_POLICY.MIXED;
         create_game(NUM_ROWS, cols: NUM_COLS);
         
+    }
+    
+    init(level:Level)
+    {
+        NUM_ROWS = level.dimension;
+        NUM_COLS = level.dimension;
+        COUNT = 0;
+        GAME_OVER = false;
+        NUM_LOCS = NUM_ROWS * NUM_COLS;
+        START_LOC = Int(floor(Float(NUM_LOCS) / 2.0));
+        GAME_STARTED = false;
+        self.MINE_SPEED = level.speed;
+        self.POLICY = level.policy;
+        create_game(level.dimension, cols: level.dimension);
+        self.level_no = level.level;
     }
     
     func won_game()->Bool
@@ -434,11 +473,11 @@ class GameMap
     
     // REQUIRES: SPEED IS WITHIN [0-10]
     // generates mines based on policy
-    func generate_mines(policy:MINE_POLICY, speed:Int, loc_id:Int)
+    func generate_mines(policy:MINE_POLICY, loc_id:Int)
     {
         var speed_pool = Array<SPEED>();
-        let num_slow = 10 - speed;
-        let num_fast = speed;
+        let num_slow = 10 - self.MINE_SPEED;
+        let num_fast = self.MINE_SPEED;
         
         for(var i = 0; i < num_slow; ++i)
         {
@@ -476,11 +515,11 @@ class GameMap
             var rand_num = arc4random_uniform(2); // can be either 0 or 1
             if(rand_num == 0)
             {
-                generate_mines(MINE_POLICY.LOCAL, speed: speed, loc_id: loc_id);
+                generate_mines(MINE_POLICY.LOCAL, loc_id: loc_id);
             }
             else
             {
-                generate_mines(MINE_POLICY.GLOBAL, speed: speed, loc_id: loc_id);
+                generate_mines(MINE_POLICY.GLOBAL, loc_id: loc_id);
             }
         }
     }
@@ -526,7 +565,7 @@ class GameMap
             }
             if(!GAME_OVER)
             {
-                generate_mines(MINE_POLICY.MIXED, speed: 7, loc_id: loc_id);
+                generate_mines(self.POLICY, loc_id: loc_id);
             }
         }
     }
