@@ -56,17 +56,17 @@ class Level:UIButton
 
 func gen_levels()
 {
-    for(var i = 0; i < 8; ++i)
+    for(var i = 0; i < 15; ++i)
     {
         levels.append(Level(in_level: i, in_speed: 8, in_policy: MINE_POLICY.MIXED, in_dimension: 3));
     }
-    for(var i = 8; i < 16; ++i)
+    for(var i = 15; i < 30; ++i)
     {
-        levels.append(Level(in_level: i, in_speed: 6, in_policy: MINE_POLICY.MIXED, in_dimension: 5));
+        levels.append(Level(in_level: i, in_speed: 2, in_policy: MINE_POLICY.GLOBAL, in_dimension: 5));
     }
-    for(var i = 16; i < 24; ++i)
+    for(var i = 30; i < 45; ++i)
     {
-        levels.append(Level(in_level: i, in_speed: 3, in_policy: MINE_POLICY.MIXED, in_dimension: 7));
+        levels.append(Level(in_level: i, in_speed: 10, in_policy: MINE_POLICY.GLOBAL, in_dimension: 7));
     }
 }
 

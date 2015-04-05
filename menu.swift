@@ -12,6 +12,7 @@ class menu_button:UIButton
 {
     var level:Int;
     var progress:Int;
+    var level_status_indicator = Array<UIView>();
     override init()
     {
         self.level = 0;
@@ -34,6 +35,14 @@ class menu_button:UIButton
         self.progress = in_progress;
         super.init();
     }
+    func update_progress()
+    {
+        for(var i = 0; i < level_status_indicator.count; ++i)
+        {
+            level_status_indicator[i].backgroundColor = UIColor.greenColor();
+            level_status_indicator[i].layer.borderWidth = 0.5;
+        }
+    }
 }
 
 class Menu
@@ -41,11 +50,6 @@ class Menu
     var buttons:Array<menu_button> = Array<menu_button>();
     var tabs = Array<UILabel>();
     var background = UIView();
-    
-    init()
-    {
-        
-    }
     
     func removeMenu()
     {
@@ -61,6 +65,7 @@ class Menu
         tabs.removeAll(keepCapacity: true);
         
         background.removeFromSuperview();
+        
         
     }
     
@@ -87,7 +92,6 @@ class Menu
         {
             var difficulty_bar:UILabel = UILabel();
             difficulty_bar.backgroundColor = UIColor.blackColor();
-            difficulty_bar.layer.borderWidth = 1.0;
             difficulty_bar.setTranslatesAutoresizingMaskIntoConstraints(false);
             
             difficulty_bar.text = String(format: "%iX%i", 3 + (i * 2), 3 + (i * 2));
@@ -113,28 +117,29 @@ class Menu
             super_view.addConstraint(center_x);
             super_view.addConstraint(center_y);
             
-            let num_rows = 2;
-            let num_cols = 4;
+            let num_rows = 3;
+            let num_cols = 5;
             let num_sections = 3;
+            let levels_per_sec = num_rows * num_cols;
             
             for(var row = 0; row < num_rows; ++row)
             {
                 for(var col = 0; col < num_cols; ++col)
                 {
-                    var level:Int = (row * num_cols) + col + 1;
+                    var level:Int = (i * levels_per_sec) + (row * num_cols) + col;
                     var subview = menu_button(in_level: (num_cols * row) + col, in_progress: 0);
                     subview.backgroundColor = LIGHT_BLUE;
                     subview.setTranslatesAutoresizingMaskIntoConstraints(false);
                     subview.layer.borderWidth = 1.0;
                     subview.setTitle(String(level), forState: UIControlState.Normal);
                     subview.setTitleColor(UIColor.blackColor(), forState: UIControlState.Normal);
-                    var sub_height = ((super_view.bounds.height / 3.0) - tab_height) / 2.0;
-                    var sub_width = super_view.bounds.width / 4.0;
+                    var sub_height = ((super_view.bounds.height / CGFloat(num_sections)) - tab_height) / CGFloat(num_rows);
+                    var sub_width = super_view.bounds.width / CGFloat(num_cols);
                     
                     var center_y_const = tab_height + (sub_height * 0.5) + (sub_height * CGFloat(row)) + (super_view.bounds.height / 3.0 * CGFloat(i));
                     var center_x_const = (sub_width * 0.5) + (sub_width * CGFloat(col));
                     
-                    var width_sub_constr = NSLayoutConstraint(item: subview, attribute: NSLayoutAttribute.Width, relatedBy: NSLayoutRelation.Equal, toItem: super_view, attribute: NSLayoutAttribute.Width, multiplier: 0.25, constant: 0.0);
+                    var width_sub_constr = NSLayoutConstraint(item: subview, attribute: NSLayoutAttribute.Width, relatedBy: NSLayoutRelation.Equal, toItem: super_view, attribute: NSLayoutAttribute.Width, multiplier: 1.0 / CGFloat(num_cols), constant: 0.0);
                     
                     var sub_height_constr = NSLayoutConstraint(item: subview, attribute: NSLayoutAttribute.Top, relatedBy: NSLayoutRelation.Equal, toItem: subview, attribute: NSLayoutAttribute.Bottom, multiplier: 1.0, constant: -sub_height);
                     
@@ -148,8 +153,131 @@ class Menu
                     super_view.addConstraint(sub_height_constr);
                     super_view.addConstraint(center_y_constr);
                     super_view.addConstraint(center_x_constr);
+                    
+                    for(var j = 0; j < 3; ++j)  // generate status
+                    {
+                        var level_status = UIView();
+                        level_status.setTranslatesAutoresizingMaskIntoConstraints(false);
+                        level_status.backgroundColor = UIColor.clearColor();
+                        //level_status.layer.borderWidth = 0.5;
+                        
+                        var left_const = super_view.frame.width / CGFloat(num_cols) / 3.0 * CGFloat(j);
+                        
+                        var status_height_constr = NSLayoutConstraint(item: level_status, attribute: NSLayoutAttribute.Height, relatedBy: NSLayoutRelation.Equal, toItem: subview, attribute: NSLayoutAttribute.Height, multiplier: 0.15, constant: 0.0);
+                        
+                        var status_width_constr = NSLayoutConstraint(item: level_status, attribute: NSLayoutAttribute.Width, relatedBy: NSLayoutRelation.Equal, toItem: subview, attribute: NSLayoutAttribute.Width, multiplier: 1.0 / 3.0, constant: 0.0);
+
+                        var status_left = NSLayoutConstraint(item: level_status, attribute: NSLayoutAttribute.Left, relatedBy: NSLayoutRelation.Equal, toItem: subview, attribute: NSLayoutAttribute.Left, multiplier: 1.0, constant: left_const);
+                        
+                        var status_bottom = NSLayoutConstraint(item: level_status, attribute: NSLayoutAttribute.Bottom, relatedBy: NSLayoutRelation.Equal, toItem: subview, attribute: NSLayoutAttribute.Bottom, multiplier: 1.0, constant: 0.0);
+                        
+                        subview.addSubview(level_status);
+                        subview.addConstraint(status_left);
+                        subview.addConstraint(status_bottom);
+                        subview.addConstraint(status_height_constr);
+                        subview.addConstraint(status_width_constr);
+                        subview.level_status_indicator.append(level_status);
+                    }
                 }
             }
+        }
+        for(var i = 0; i < levels_completed.count; ++i)
+        {
+            buttons[levels_completed[i]].update_progress();
+        }
+    }
+}
+
+class Main_menu
+{
+    var background = UIView();
+    var menu_options = ["free play","settings", "about"];
+    var colors = [UIColor.blackColor().CGColor, LIGHT_BLUE.CGColor];
+    var locations = [0, 1];
+    var title = "MINE ESCAPE";
+    var menu_buttons = Array<UIButton>();
+    
+    func remove_main_menu()
+    {
+        while(background.subviews.count > 0)
+        {
+            background.subviews[0].removeFromSuperview();
+        }
+        for(var i = 0; i < menu_buttons.count; ++i)
+        {
+            menu_buttons[i].removeFromSuperview();
+        }
+        background.removeFromSuperview();
+        menu_buttons.removeAll(keepCapacity: true);
+    }
+    
+    
+    func show_main_menu()
+    {
+        background.setTranslatesAutoresizingMaskIntoConstraints(false);
+        
+        
+        // generate constraints for background
+        var width = NSLayoutConstraint(item: background, attribute: NSLayoutAttribute.Width, relatedBy: NSLayoutRelation.Equal, toItem: super_view, attribute: NSLayoutAttribute.Width, multiplier: 1.0, constant: 0.0);
+        
+        var height = NSLayoutConstraint(item: background, attribute: NSLayoutAttribute.Height, relatedBy: NSLayoutRelation.Equal, toItem: super_view, attribute: NSLayoutAttribute.Height, multiplier: 1.0, constant: 0.0);
+        
+        var centerx = NSLayoutConstraint(item: background, attribute: NSLayoutAttribute.CenterX, relatedBy: NSLayoutRelation.Equal, toItem: super_view, attribute: NSLayoutAttribute.CenterX, multiplier: 1.0, constant: 0.0);
+        
+        var centery = NSLayoutConstraint(item: background, attribute: NSLayoutAttribute.CenterY, relatedBy: NSLayoutRelation.Equal, toItem: super_view, attribute: NSLayoutAttribute.CenterY, multiplier: 1.0, constant: 0.0);
+        
+        super_view.addSubview(background);
+        super_view.addConstraint(width);
+        super_view.addConstraint(height);
+        super_view.addConstraint(centerx);
+        super_view.addConstraint(centery);
+        
+        // set up gradiant
+        var gradient = CAGradientLayer();
+        gradient.frame = super_view.bounds;
+        gradient.locations = locations;
+        gradient.colors = colors;
+        gradient.startPoint = CGPoint(x: 0.5, y: 0.0);
+        gradient.endPoint = CGPoint(x: 0.5, y: 1.0);
+        background.layer.insertSublayer(gradient, atIndex: 0);
+        
+        // insert title
+        var baseline:CGFloat = 150.0;
+        var title_label = UILabel();
+        title_label.setTranslatesAutoresizingMaskIntoConstraints(false);
+        title_label.text = title;
+        title_label.textColor = LIGHT_BLUE;
+        title_label.font = UIFont(name: "Arial", size: 40.0);
+        
+        var center_title = NSLayoutConstraint(item: title_label, attribute: NSLayoutAttribute.CenterX, relatedBy: NSLayoutRelation.Equal, toItem: background, attribute: NSLayoutAttribute.CenterX, multiplier: 1.0, constant: 0.0);
+        
+        var dist_from_top = NSLayoutConstraint(item: title_label, attribute: NSLayoutAttribute.Top, relatedBy: NSLayoutRelation.Equal, toItem: background, attribute: NSLayoutAttribute.Top, multiplier: 1.0, constant: baseline);
+        
+        background.addSubview(title_label);
+        background.addConstraint(center_title);
+        background.addConstraint(dist_from_top);
+        
+       
+        // add the menu buttons
+        for(var i = 0; i < menu_options.count; ++i)
+        {
+            var increment = (baseline * 1.75) + (50.0 * CGFloat(i));
+            
+            // set button attributes
+            var menu_button = UIButton();
+            menu_button.titleLabel?.font = UIFont(name: "Arial", size: 25.0);
+            menu_button.setTranslatesAutoresizingMaskIntoConstraints(false);
+            menu_button.setTitle(menu_options[i], forState: UIControlState.Normal);
+            menu_buttons.append(menu_button);
+            // set button constraints
+            var center_mb_x = NSLayoutConstraint(item: menu_button, attribute: NSLayoutAttribute.CenterX, relatedBy: NSLayoutRelation.Equal, toItem: background, attribute: NSLayoutAttribute.CenterX, multiplier: 1.0, constant: 0.0);
+            
+            var bottom_x = NSLayoutConstraint(item: menu_button, attribute: NSLayoutAttribute.CenterY, relatedBy: NSLayoutRelation.Equal, toItem: background, attribute: NSLayoutAttribute.Top, multiplier: 1.0, constant: increment);
+            
+            // organize hiearchy
+            background.addSubview(menu_button);
+            background.addConstraint(center_mb_x);
+            background.addConstraint(bottom_x);
         }
     }
 }

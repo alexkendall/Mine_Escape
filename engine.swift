@@ -145,7 +145,7 @@ class Mine_cell:UIButton
             else if(speed == SPEED.FAST)
             {
                 time_til_disappears = 4;
-                timer = NSTimer.scheduledTimerWithTimeInterval(0.5, target: self, selector: "update", userInfo: nil, repeats: true);
+                timer = NSTimer.scheduledTimerWithTimeInterval(0.25, target: self, selector: "update", userInfo: nil, repeats: true);
                 timer_running = true;
             }
         }
@@ -181,6 +181,24 @@ class GameMap
     var POLICY:MINE_POLICY;
     var level_indicator:UILabel = UILabel();
     var level_no:Int = 0;
+    var MAIN_MENU_button = UIButton();
+    
+    func remove_views()
+    {
+        for(var i = 0; i < map.count; ++i)
+        {
+            map[i].removeFromSuperview();
+        }
+        new_game_button.removeFromSuperview();
+        bottom_text.removeFromSuperview();
+        for(var i = 0; i < size_buttons.count; ++i)
+        {
+            size_buttons[i].removeFromSuperview();
+        }
+        MENU_button.removeFromSuperview();
+        level_indicator.removeFromSuperview();
+        MAIN_MENU_button.removeFromSuperview();
+    }
     
     func create_game(rows:Int, cols:Int)
     {
@@ -280,7 +298,7 @@ class GameMap
     
         
         MENU_button.setTranslatesAutoresizingMaskIntoConstraints(false);
-        MENU_button.setTitle("MENU", forState: UIControlState.Normal);
+        MENU_button.setTitle("LEVELS", forState: UIControlState.Normal);
         MENU_button.setTitleColor(UIColor.whiteColor(), forState: UIControlState.Normal);
         super_view.addSubview(MENU_button);
         
@@ -290,6 +308,18 @@ class GameMap
         
         super_view.addConstraint(menu_offset_x);
         super_view.addConstraint(offsety_menu);
+        
+        MAIN_MENU_button.setTranslatesAutoresizingMaskIntoConstraints(false);
+        MAIN_MENU_button.setTitle("MAIN MENU", forState: UIControlState.Normal);
+        MAIN_MENU_button.setTitleColor(UIColor.whiteColor(), forState: UIControlState.Normal);
+        super_view.addSubview(MAIN_MENU_button);
+        
+        var main_menu_offset_x = NSLayoutConstraint(item: MAIN_MENU_button, attribute: NSLayoutAttribute.Left, relatedBy: NSLayoutRelation.Equal, toItem: super_view, attribute: NSLayoutAttribute.Left, multiplier: 1.0, constant: 20.0);
+        
+        var main_offsety_menu = NSLayoutConstraint(item: MAIN_MENU_button, attribute: NSLayoutAttribute.CenterY, relatedBy: NSLayoutRelation.Equal, toItem: MENU_button, attribute: NSLayoutAttribute.CenterY, multiplier: 1.0, constant: -20.0);
+        
+        super_view.addConstraint(main_menu_offset_x);
+        super_view.addConstraint(main_offsety_menu);
         
         
         for(var i = 0; i < 3; ++i)
@@ -325,7 +355,7 @@ class GameMap
         
         super_view.addConstraint(centery_li);
         super_view.addConstraint(offset_rightli);
-        //level_indicator.text = String(format:"LEVEL %i", current_level);
+        level_indicator.text = String(format:"LEVEL %i", current_level);
         level_indicator.textColor = UIColor.whiteColor();
 
     }
@@ -524,6 +554,14 @@ class GameMap
         }
     }
     
+    func mark_completed()
+    {
+        if(find(levels_completed, level_no) == nil)
+        {
+            levels_completed.append(level_no);
+        }
+    }
+    
     func mark_location(var loc_id:Int)
     {
         if(GAME_STARTED == false)
@@ -559,13 +597,14 @@ class GameMap
                 {
                     self.bottom_text.text = "YOU WIN!";
                     self.bottom_text.textColor = LIGHT_BLUE;
+                    mark_completed();
                     GAME_OVER = true;
                     end_game();
                 }
-            }
-            if(!GAME_OVER)
-            {
-                generate_mines(self.POLICY, loc_id: loc_id);
+                else if(!GAME_OVER)
+                {
+                    generate_mines(self.POLICY, loc_id: loc_id);
+                }
             }
         }
     }
