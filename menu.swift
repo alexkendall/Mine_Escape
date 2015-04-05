@@ -39,13 +39,13 @@ class menu_button:UIButton
     {
         for(var i = 0; i < level_status_indicator.count; ++i)
         {
-            level_status_indicator[i].backgroundColor = UIColor.greenColor();
+            level_status_indicator[i].backgroundColor = UIColor.orangeColor();
             level_status_indicator[i].layer.borderWidth = 0.5;
         }
     }
 }
 
-class Menu
+class LevelMenu
 {
     var buttons:Array<menu_button> = Array<menu_button>();
     var tabs = Array<UILabel>();
@@ -246,7 +246,7 @@ class Main_menu
         var title_label = UILabel();
         title_label.setTranslatesAutoresizingMaskIntoConstraints(false);
         title_label.text = title;
-        title_label.textColor = LIGHT_BLUE;
+        title_label.textColor = UIColor.orangeColor();
         title_label.font = UIFont(name: "Arial", size: 40.0);
         
         var center_title = NSLayoutConstraint(item: title_label, attribute: NSLayoutAttribute.CenterX, relatedBy: NSLayoutRelation.Equal, toItem: background, attribute: NSLayoutAttribute.CenterX, multiplier: 1.0, constant: 0.0);
@@ -266,6 +266,7 @@ class Main_menu
             // set button attributes
             var menu_button = UIButton();
             menu_button.titleLabel?.font = UIFont(name: "Arial", size: 25.0);
+            menu_button.setTitleColor(UIColor.whiteColor(), forState: UIControlState.Normal);
             menu_button.setTranslatesAutoresizingMaskIntoConstraints(false);
             menu_button.setTitle(menu_options[i], forState: UIControlState.Normal);
             menu_buttons.append(menu_button);
@@ -278,6 +279,124 @@ class Main_menu
             background.addSubview(menu_button);
             background.addConstraint(center_mb_x);
             background.addConstraint(bottom_x);
+        }
+    }
+}
+
+class HowToScreen
+{
+    var background = UIView();
+    var text = "Click all squares that do not contain mines." + " As you explore more squares, more mines will appear." +
+    " But beware, mines dissapear after a short amount of time. Red mines will be visible longer than blue mines." +
+    " You win once all sqaures not containing mines are explored.";
+    var text_view = UITextView();
+    var back_button = UIButton();
+    
+    func bring_up()
+    {
+        
+        background.setTranslatesAutoresizingMaskIntoConstraints(false);
+        
+        // generate constraints for background
+        var width = NSLayoutConstraint(item: background, attribute: NSLayoutAttribute.Width, relatedBy: NSLayoutRelation.Equal, toItem: super_view, attribute: NSLayoutAttribute.Width, multiplier: 1.0, constant: 0.0);
+        
+        var height = NSLayoutConstraint(item: background, attribute: NSLayoutAttribute.Height, relatedBy: NSLayoutRelation.Equal, toItem: super_view, attribute: NSLayoutAttribute.Height, multiplier: 1.0, constant: 0.0);
+        
+        var centerx = NSLayoutConstraint(item: background, attribute: NSLayoutAttribute.CenterX, relatedBy: NSLayoutRelation.Equal, toItem: super_view, attribute: NSLayoutAttribute.CenterX, multiplier: 1.0, constant: 0.0);
+        
+        var centery = NSLayoutConstraint(item: background, attribute: NSLayoutAttribute.CenterY, relatedBy: NSLayoutRelation.Equal, toItem: super_view, attribute: NSLayoutAttribute.CenterY, multiplier: 1.0, constant: 0.0);
+        
+        super_view.addSubview(background);
+        super_view.addConstraint(width);
+        super_view.addConstraint(height);
+        super_view.addConstraint(centerx);
+        super_view.addConstraint(centery);
+        
+        // set up gradiant
+        var colors = [UIColor.blackColor().CGColor, LIGHT_BLUE.CGColor];
+        var locations = [0, 1];
+        
+        var gradient = CAGradientLayer();
+        gradient.frame = super_view.bounds;
+        gradient.locations = locations;
+        gradient.colors = colors;
+        gradient.startPoint = CGPoint(x: 0.5, y: 0.0);
+        gradient.endPoint = CGPoint(x: 0.5, y: 1.0);
+        background.layer.insertSublayer(gradient, atIndex: 0);
+
+        super_view.addSubview(background);
+        super_view.addConstraint(width);
+        super_view.addConstraint(height);
+        super_view.addConstraint(centerx);
+        super_view.addConstraint(centery);
+        
+        var baseline_height:CGFloat = 75.0;
+        var seperation:CGFloat = 50.0;
+
+        // generate constraints for text_view
+        var width_tv = NSLayoutConstraint(item: text_view, attribute: NSLayoutAttribute.Width, relatedBy: NSLayoutRelation.Equal, toItem: background, attribute: NSLayoutAttribute.Width, multiplier: 0.75, constant: 0.0);
+        
+        var height_tv = NSLayoutConstraint(item: text_view, attribute: NSLayoutAttribute.Height, relatedBy: NSLayoutRelation.Equal, toItem: background, attribute: NSLayoutAttribute.Height, multiplier: 0.75, constant: 0.0);
+        
+        var centerx_tv = NSLayoutConstraint(item: text_view, attribute: NSLayoutAttribute.CenterX, relatedBy: NSLayoutRelation.Equal, toItem: background, attribute: NSLayoutAttribute.CenterX, multiplier: 1.0, constant: 0.0);
+        
+        var centery_tv = NSLayoutConstraint(item: text_view, attribute: NSLayoutAttribute.Top, relatedBy: NSLayoutRelation.Equal, toItem: background, attribute: NSLayoutAttribute.Top, multiplier: 1.0, constant: baseline_height + seperation);
+        
+        // generate title subview
+      
+        var title = UILabel();
+        title.setTranslatesAutoresizingMaskIntoConstraints(false);
+        var centerx_title = NSLayoutConstraint(item: title, attribute: NSLayoutAttribute.CenterX, relatedBy: NSLayoutRelation.Equal, toItem: background, attribute: NSLayoutAttribute.CenterX, multiplier: 1.0, constant: 0.0);
+        var centery_title = NSLayoutConstraint(item: title, attribute: NSLayoutAttribute.Top, relatedBy: NSLayoutRelation.Equal, toItem: background, attribute: NSLayoutAttribute.Top, multiplier: 1.0, constant: baseline_height);
+        
+        // configure title subview
+        title.text = "How to Play";
+        title.textColor = UIColor.orangeColor();
+        title.font = UIFont(name: "Arial", size: 30.0);
+        
+        
+        // organize heiarchy
+        background.addSubview(title);
+        background.addConstraint(centerx_title);
+        background.addConstraint(centery_title);
+        
+        // configure text view
+        text_view.setTranslatesAutoresizingMaskIntoConstraints(false);
+        text_view.frame = super_view.bounds;
+        text_view.text = text;
+        text_view.textAlignment = NSTextAlignment.Left;
+        text_view.textColor = UIColor.whiteColor();
+        text_view.backgroundColor = UIColor.clearColor();
+        text_view.font = UIFont(name: "Arial", size: 25.0);
+        text_view.editable = false;
+        
+        
+        // organize hiearchy
+        background.addSubview(text_view);
+        background.addConstraint(width_tv);
+        background.addConstraint(height_tv);
+        background.addConstraint(centerx_tv);
+        background.addConstraint(centery_tv);
+        
+        // create back button
+        back_button = UIButton();
+        back_button.setTranslatesAutoresizingMaskIntoConstraints(false);
+        var left_back = NSLayoutConstraint(item: back_button, attribute: NSLayoutAttribute.Left, relatedBy: NSLayoutRelation.Equal, toItem: background, attribute: NSLayoutAttribute.Left, multiplier: 1.0, constant: 30.0);
+        var down_back = NSLayoutConstraint(item: back_button, attribute: NSLayoutAttribute.Bottom, relatedBy: NSLayoutRelation.Equal, toItem: background, attribute: NSLayoutAttribute.Bottom, multiplier: 1.0, constant: -25.0);
+        
+        // organize hiearchy
+        background.addSubview(back_button);
+        background.addConstraint(left_back);
+        background.addConstraint(down_back);
+        
+        back_button.setTitle("BACK", forState: UIControlState.Normal);
+        back_button.setTitleColor(UIColor.orangeColor(), forState: UIControlState.Highlighted);
+    }
+    func pull_down()
+    {
+        while(background.subviews.count > 0)
+        {
+            background.subviews.first?.removeFromSuperview();
         }
     }
 }

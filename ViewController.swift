@@ -9,13 +9,15 @@ import UIKit
 var super_view = UIView();
 var game:GameMap = GameMap();
 var DIM:Int = 3;
-var menu:Menu = Menu();
+var level_menu:LevelMenu = LevelMenu();
 var current_level = 0;
 var levels_completed = Array<Int>(); // will store this in core data in future
 var main_menu:Main_menu = Main_menu();
 var in_main_menu = true;
+var in_level_menu = false;
 var in_game = false;
-
+var in_how_to = false;
+var how_to_screen = HowToScreen();
 class ViewController: UIViewController {
 
     override func prefersStatusBarHidden() -> Bool {
@@ -33,23 +35,29 @@ class ViewController: UIViewController {
         viewDidLoad();
     }
     
-    func eneter_level(sender:menu_button!)
+    func load_level(sender:menu_button!)
     {
         current_level = sender.level;
         game.bottom_text.text = "";
-        menu.removeMenu();
+        level_menu.removeMenu();
+        in_level_menu = false;
+        in_game = true;
+        in_how_to = false;
+        in_main_menu = false;
         viewDidLoad();
     }
     
-    func enter_menu()
+    func enter_level_menu()
     {
         remove_subviews();
-        menu.createMenu();
-        for(var i = 0; i < menu.buttons.count; ++i)
+        level_menu.createMenu();
+        for(var i = 0; i < level_menu.buttons.count; ++i)
         {
-            menu.buttons[i].addTarget(self, action: "eneter_level:", forControlEvents: UIControlEvents.TouchDown);
-            menu.buttons[i].tag = i;
-            menu.buttons[i].level = i;
+            level_menu.buttons[i].addTarget(self, action: "load_level:", forControlEvents: UIControlEvents.TouchUpInside);
+            level_menu.buttons[i].setTitleColor(UIColor.whiteColor(), forState: UIControlState.Highlighted);
+            level_menu.buttons[i].setTitleShadowColor(UIColor.whiteColor(), forState: UIControlState.Highlighted);
+            level_menu.buttons[i].tag = i;
+            level_menu.buttons[i].level = i;
         }
     }
     
@@ -68,8 +76,19 @@ class ViewController: UIViewController {
         if(sender.tag == 0)
         {
             in_main_menu = false;
-            in_game = true;
+            in_game = false;
+            in_how_to = false;
+            in_level_menu = true;
             remove_subviews();
+            viewDidLoad();
+        }
+        if(sender.tag == 2)
+        {
+            in_main_menu = false;
+            in_how_to = true;
+            in_game = false;
+            remove_subviews();
+            how_to_screen.bring_up();
             viewDidLoad();
         }
     }
@@ -78,6 +97,7 @@ class ViewController: UIViewController {
     {
         in_game = false;
         in_main_menu = true;
+        how_to_screen.pull_down();
         remove_subviews();
         main_menu.remove_main_menu();
         viewDidLoad();
@@ -91,8 +111,11 @@ class ViewController: UIViewController {
         super_view.backgroundColor = UIColor.blackColor(); // hide date and time
         super_view.setTranslatesAutoresizingMaskIntoConstraints(false);
         
-        
-        if(in_game)
+        if(in_level_menu)
+        {
+            enter_level_menu();
+        }
+        else if(in_game)
         {
             gen_levels();
             game.remove_views();
@@ -103,8 +126,10 @@ class ViewController: UIViewController {
                 game.map[i].addTarget(self, action: "pressed_loc:", forControlEvents: UIControlEvents.TouchDown);
             }
         
-            game.new_game_button.addTarget(self, action: "reset", forControlEvents: UIControlEvents.TouchDown);
-            game.MENU_button.addTarget(self, action: "enter_menu", forControlEvents: UIControlEvents.TouchDown);
+            game.new_game_button.addTarget(self, action: "reset", forControlEvents: UIControlEvents.TouchUpInside);
+            game.new_game_button.setTitleColor(UIColor.orangeColor(), forState: UIControlState.Highlighted);
+            game.MENU_button.addTarget(self, action: "enter_level_menu", forControlEvents: UIControlEvents.TouchUpInside);
+            game.MENU_button.setTitleColor(UIColor.orangeColor(), forState: UIControlState.Highlighted);
         
             for(var i = 0; i < 3; ++i)
             {
@@ -115,7 +140,8 @@ class ViewController: UIViewController {
             }
             
             // add button to enter main menu
-            game.MAIN_MENU_button.addTarget(self, action: "entered_main:", forControlEvents: UIControlEvents.TouchDown);
+            game.MAIN_MENU_button.addTarget(self, action: "entered_main:", forControlEvents: UIControlEvents.TouchUpInside);
+            game.MAIN_MENU_button.setTitleColor(UIColor.orangeColor(), forState: UIControlState.Highlighted);
             
         }
         else if(in_main_menu)
@@ -125,11 +151,15 @@ class ViewController: UIViewController {
             // add targets to each button
             for(var i = 0; i < main_menu.menu_buttons.count; ++i)
             {
-                main_menu.menu_buttons[i].addTarget(self, action: "exited_main:", forControlEvents: UIControlEvents.TouchDown);
+                main_menu.menu_buttons[i].addTarget(self, action: "exited_main:", forControlEvents: UIControlEvents.TouchUpInside);
                 main_menu.menu_buttons[i].tag = i;
+                main_menu.menu_buttons[i].setTitleColor(UIColor.orangeColor(), forState: UIControlState.Highlighted);
             }
         }
-        
+        else if(in_how_to)
+        {
+            how_to_screen.back_button.addTarget(self, action: "entered_main:", forControlEvents: UIControlEvents.TouchUpInside);
+        }
     }
     override func didReceiveMemoryWarning() {
         super.didReceiveMemoryWarning()
@@ -143,6 +173,7 @@ class ViewController: UIViewController {
         {
             subs[i].removeFromSuperview();
         }
+        super_view.layer.borderWidth = 0.0;
     }
 }
 
