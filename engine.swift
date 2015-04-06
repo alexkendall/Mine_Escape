@@ -9,11 +9,10 @@
 //-------------------------------------------------------------------------
 
 import UIKit
+var next_game_win = Next_Game();
 
 //-------------------------------------------------------------------------
 // GLOBAL VARIABLES
-
-let TOP_BORDER:CGFloat = 20.0;
 
 // colors
 let LIGHT_BLUE = UIColor(red: 0.0, green: 0.8, blue: 1.0, alpha: 1.0);
@@ -211,6 +210,7 @@ class GameMap
         START_LOC = Int(floor(Float(NUM_LOCS) / 2.0));
         GAME_STARTED = false;
         
+        var margin_height = (super_view.bounds.height - super_view.bounds.width) / 2.0;
         
         var size:Float = 1.0;
         // create grid of elements
@@ -235,7 +235,7 @@ class GameMap
                 
                 var increment_centery:CGFloat  = (super_view.bounds.width / CGFloat(NUM_ROWS) * 0.5) + (super_view.bounds.width / CGFloat(NUM_ROWS) * CGFloat(row));
 
-                var increment_y = NSLayoutConstraint(item: subview, attribute: NSLayoutAttribute.CenterY, relatedBy: NSLayoutRelation.Equal, toItem: super_view, attribute: NSLayoutAttribute.Top, multiplier: 1.0, constant: increment_centery + TOP_BORDER);
+                var increment_y = NSLayoutConstraint(item: subview, attribute: NSLayoutAttribute.CenterY, relatedBy: NSLayoutRelation.Equal, toItem: super_view, attribute: NSLayoutAttribute.Top, multiplier: 1.0, constant: increment_centery + margin_height);
                 
                 subview.backgroundColor = UIColor.whiteColor();
                 subview.layer.borderWidth = 1.0;
@@ -316,7 +316,7 @@ class GameMap
         
         var main_menu_offset_x = NSLayoutConstraint(item: MAIN_MENU_button, attribute: NSLayoutAttribute.Left, relatedBy: NSLayoutRelation.Equal, toItem: super_view, attribute: NSLayoutAttribute.Left, multiplier: 1.0, constant: 20.0);
         
-        var main_offsety_menu = NSLayoutConstraint(item: MAIN_MENU_button, attribute: NSLayoutAttribute.CenterY, relatedBy: NSLayoutRelation.Equal, toItem: MENU_button, attribute: NSLayoutAttribute.CenterY, multiplier: 1.0, constant: -20.0);
+        var main_offsety_menu = NSLayoutConstraint(item: MAIN_MENU_button, attribute: NSLayoutAttribute.Top, relatedBy: NSLayoutRelation.Equal, toItem: super_view, attribute: NSLayoutAttribute.Top, multiplier: 1.0, constant: 20.0);
         
         super_view.addConstraint(main_menu_offset_x);
         super_view.addConstraint(main_offsety_menu);
@@ -586,8 +586,9 @@ class GameMap
                 map[loc_id].layer.borderWidth = 1.0;
                 map[loc_id].layer.borderColor = UIColor.whiteColor().CGColor;
                 map[loc_id].set_image("mine_white");
-                self.bottom_text.text = "YOU LOST!";
-                self.bottom_text.textColor = UIColor.redColor();
+                //self.bottom_text.textColor = UIColor.redColor();
+                next_game_win.won_game = false;
+                next_game_win.bring_up_window();
             }
             else if(!map[loc_id].explored)
             {
@@ -595,11 +596,12 @@ class GameMap
                 ++COUNT;
                 if(won_game())
                 {
-                    self.bottom_text.text = "YOU WIN!";
                     self.bottom_text.textColor = LIGHT_BLUE;
                     mark_completed();
                     GAME_OVER = true;
                     end_game();
+                    next_game_win.won_game = true;
+                    next_game_win.bring_up_window();
                 }
                 else if(!GAME_OVER)
                 {

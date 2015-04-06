@@ -102,6 +102,15 @@ class ViewController: UIViewController {
         main_menu.remove_main_menu();
         viewDidLoad();
     }
+    func next_level(sender:UIButton!)
+    {
+        if(next_game_win.won_game)
+        {
+            current_level++;
+        }
+        next_game_win.bring_down_window();
+        viewDidLoad();
+    }
 
     override func viewDidLoad()
     {
@@ -142,6 +151,7 @@ class ViewController: UIViewController {
             // add button to enter main menu
             game.MAIN_MENU_button.addTarget(self, action: "entered_main:", forControlEvents: UIControlEvents.TouchUpInside);
             game.MAIN_MENU_button.setTitleColor(UIColor.orangeColor(), forState: UIControlState.Highlighted);
+            next_game_win.next_level.addTarget(self, action: "next_level:", forControlEvents: UIControlEvents.TouchUpInside);
             
         }
         else if(in_main_menu)
