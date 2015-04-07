@@ -57,17 +57,78 @@ class Level:UIButton
 
 func gen_levels()
 {
-    for(var i = 0; i < 15; ++i)
+    for(var i = 0; i < NUM_LEVELS / 3; ++i)
     {
-        levels.append(Level(in_level: i, in_speed: 8, in_policy: MINE_POLICY.MIXED, in_dimension: 3));
+        // determine mine speed
+        var speed = Int(ceil((Double(i)) / (Double(NUM_LEVELS) / 3.0) * 10.0));
+        
+        // determine mine policy
+        var policy:MINE_POLICY;
+        if(i < (NUM_LEVELS / 3 / 3))
+        {
+            // local policy
+            policy = MINE_POLICY.LOCAL;
+        }
+        else if (i < (NUM_LEVELS / 3 * 2 / 3))
+        {
+            // mixed policy
+            policy = MINE_POLICY.MIXED;
+        }
+        else
+        {
+            // global policy
+            policy = MINE_POLICY.GLOBAL;
+        }
+        
+        levels.append(Level(in_level: i, in_speed: speed, in_policy: policy, in_dimension: 3));
     }
-    for(var i = 15; i < 30; ++i)
+    for(var i = 15; i < NUM_LEVELS * 2 / 3; ++i)
     {
-        levels.append(Level(in_level: i, in_speed: 5, in_policy: MINE_POLICY.GLOBAL, in_dimension: 5));
+        // determine mine speed
+        var speed = Int(ceil((Double(i) - 15.0) / (Double(NUM_LEVELS) / 3.0) * 10.0));
+        
+        // determine mine policy
+        var policy:MINE_POLICY;
+        if((i-15) < (NUM_LEVELS / 3 / 3))
+        {
+            // local policy
+            policy = MINE_POLICY.LOCAL;
+        }
+        else if ((i-15) < (NUM_LEVELS / 3 * 2 / 3))
+        {
+            // mixed policy
+            policy = MINE_POLICY.MIXED;
+        }
+        else
+        {
+            // global policy
+            policy = MINE_POLICY.GLOBAL;
+        }
+        levels.append(Level(in_level: i, in_speed: speed, in_policy: policy, in_dimension: 5));
     }
-    for(var i = 30; i < 45; ++i)
+    for(var i = 30; i < NUM_LEVELS; ++i)
     {
-        levels.append(Level(in_level: i, in_speed: 10, in_policy: MINE_POLICY.GLOBAL, in_dimension: 7));
+        // determine mine speed
+        var speed = Int(ceil((Double(i) - 30.0) / (Double(NUM_LEVELS) / 3.0) * 10.0));
+        
+        // determine mine policy
+        var policy:MINE_POLICY;
+        if((i-30) < (NUM_LEVELS / 3 / 3))
+        {
+            // local policy
+            policy = MINE_POLICY.LOCAL;
+        }
+        else if ((i-30) < (NUM_LEVELS / 3 * 2 / 3))
+        {
+            // mixed policy
+            policy = MINE_POLICY.MIXED;
+        }
+        else
+        {
+            // global policy
+            policy = MINE_POLICY.GLOBAL;
+        }
+        levels.append(Level(in_level: i, in_speed: speed, in_policy: policy, in_dimension: 7));
     }
 }
 

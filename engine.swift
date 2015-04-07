@@ -165,7 +165,6 @@ class Mine_cell:UIButton
 class GameMap
 {
     var map = Array<Mine_cell>();
-    var bottom_text = UILabel();
     var NUM_ROWS:Int;
     var NUM_COLS:Int;
     var NUM_LOCS:Int;
@@ -173,16 +172,21 @@ class GameMap
     var GAME_OVER:Bool = false;
     var START_LOC:Int;
     var GAME_STARTED:Bool;
-    var size_buttons = Array<UIButton>();
-    var MENU_button = UIButton();
     var MINE_SPEED:Int;
     var POLICY:MINE_POLICY;
     var level_indicator:UILabel = UILabel();
     var level_no:Int = 0;
-    var MAIN_MENU_button = UIButton();
+
+    // labels
+    var bottom_text = UILabel();
+
+    // buttons
+    var size_buttons = Array<UIButton>();
+    var startup_menu = UIButton();
     var prev_button = UIButton();
     var next_button = UIButton();
     var repeat_button = UIButton();
+    var level_button = UIButton();
     
     func remove_views()
     {
@@ -195,9 +199,9 @@ class GameMap
         {
             size_buttons[i].removeFromSuperview();
         }
-        MENU_button.removeFromSuperview();
+        level_button.removeFromSuperview();
         level_indicator.removeFromSuperview();
-        MAIN_MENU_button.removeFromSuperview();
+        startup_menu.removeFromSuperview();
         repeat_button.removeFromSuperview();
         prev_button.removeFromSuperview();
         next_button.removeFromSuperview();
@@ -281,6 +285,7 @@ class GameMap
         var center_y_const = (super_view.bounds.width + super_view.bounds.height) / 2.0;
         var center_y = NSLayoutConstraint(item: bottom_text, attribute: NSLayoutAttribute.CenterY, relatedBy: NSLayoutRelation.Equal, toItem: super_view, attribute: NSLayoutAttribute.Top, multiplier: 1.0, constant: center_y_const);
         
+        var menu_font_size:CGFloat = 20.0
         super_view.addSubview(self.bottom_text);
         super_view.addConstraint(center_x);
         super_view.addConstraint(center_y);
@@ -289,26 +294,28 @@ class GameMap
         self.bottom_text.textAlignment = NSTextAlignment.Center;
         self.bottom_text.font = UIFont(name: "Arial-BoldMT" , size: 35.0);
         
-        MENU_button.setTranslatesAutoresizingMaskIntoConstraints(false);
-        MENU_button.setTitle("LEVEL MENU", forState: UIControlState.Normal);
-        MENU_button.setTitleColor(UIColor.orangeColor(), forState: UIControlState.Normal);
-        super_view.addSubview(MENU_button);
+        level_button.setTranslatesAutoresizingMaskIntoConstraints(false);
+        level_button.setTitle("LEVEL MENU", forState: UIControlState.Normal);
+        level_button.setTitleColor(UIColor.whiteColor(), forState: UIControlState.Normal);
+        level_button.titleLabel?.font = UIFont(name: "Arial", size: menu_font_size);
+        super_view.addSubview(level_button);
         
-        var menu_offset_x = NSLayoutConstraint(item: MENU_button, attribute: NSLayoutAttribute.Left, relatedBy: NSLayoutRelation.Equal, toItem: super_view, attribute: NSLayoutAttribute.Left, multiplier: 1.0, constant: 20.0);
+        var menu_offset_x = NSLayoutConstraint(item: level_button, attribute: NSLayoutAttribute.Right, relatedBy: NSLayoutRelation.Equal, toItem: super_view, attribute: NSLayoutAttribute.Right, multiplier: 1.0, constant: -20.0);
         
-        var offsety_menu = NSLayoutConstraint(item: MENU_button, attribute: NSLayoutAttribute.Top, relatedBy: NSLayoutRelation.Equal, toItem: super_view, attribute: NSLayoutAttribute.Top, multiplier: 1.0, constant: 45.0);
+        var offsety_menu = NSLayoutConstraint(item: level_button, attribute: NSLayoutAttribute.Top, relatedBy: NSLayoutRelation.Equal, toItem: super_view, attribute: NSLayoutAttribute.Top, multiplier: 1.0, constant: 20.0);
         
         super_view.addConstraint(menu_offset_x);
         super_view.addConstraint(offsety_menu);
         
-        MAIN_MENU_button.setTranslatesAutoresizingMaskIntoConstraints(false);
-        MAIN_MENU_button.setTitle("MAIN MENU", forState: UIControlState.Normal);
-        MAIN_MENU_button.setTitleColor(UIColor.orangeColor(), forState: UIControlState.Normal);
-        super_view.addSubview(MAIN_MENU_button);
+        startup_menu.setTranslatesAutoresizingMaskIntoConstraints(false);
+        startup_menu.setTitle("MAIN MENU", forState: UIControlState.Normal);
+        startup_menu.setTitleColor(UIColor.whiteColor(), forState: UIControlState.Normal);
+        startup_menu.titleLabel?.font = UIFont(name: "Arial", size: menu_font_size);
+        super_view.addSubview(startup_menu);
         
-        var main_menu_offset_x = NSLayoutConstraint(item: MAIN_MENU_button, attribute: NSLayoutAttribute.Left, relatedBy: NSLayoutRelation.Equal, toItem: super_view, attribute: NSLayoutAttribute.Left, multiplier: 1.0, constant: 20.0);
+        var main_menu_offset_x = NSLayoutConstraint(item: startup_menu, attribute: NSLayoutAttribute.Left, relatedBy: NSLayoutRelation.Equal, toItem: super_view, attribute: NSLayoutAttribute.Left, multiplier: 1.0, constant: 20.0);
         
-        var main_offsety_menu = NSLayoutConstraint(item: MAIN_MENU_button, attribute: NSLayoutAttribute.Top, relatedBy: NSLayoutRelation.Equal, toItem: super_view, attribute: NSLayoutAttribute.Top, multiplier: 1.0, constant: 20.0);
+        var main_offsety_menu = NSLayoutConstraint(item: startup_menu, attribute: NSLayoutAttribute.Top, relatedBy: NSLayoutRelation.Equal, toItem: super_view, attribute: NSLayoutAttribute.Top, multiplier: 1.0, constant: 20.0);
         
         super_view.addConstraint(main_menu_offset_x);
         super_view.addConstraint(main_offsety_menu);
@@ -332,6 +339,7 @@ class GameMap
             size_button.setTitle(dim_str, forState: UIControlState.Normal);
             size_button.setTitleColor(UIColor.whiteColor(), forState: UIControlState.Normal);
             size_button.tag = num;
+            
             
             super_view.addConstraint(offset_right);
             super_view.addConstraint(csy);
