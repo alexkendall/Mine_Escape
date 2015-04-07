@@ -23,7 +23,7 @@ class Level:UIButton
         self.level = 0;
         self.speed = 0;
         self.policy = MINE_POLICY.LOCAL;
-        self.dimension = 5;
+        self.dimension = 4;
         
         super.init();
     }
@@ -31,14 +31,14 @@ class Level:UIButton
         self.level = 0;
         self.speed = 0;
         self.policy = MINE_POLICY.LOCAL;
-        self.dimension = 5;
+        self.dimension = 4;
         super.init();
     }
     override init(frame: CGRect) {
         self.level = 0;
         self.speed = 0;
         self.policy = MINE_POLICY.LOCAL;
-        self.dimension = 5;
+        self.dimension = 4;
         super.init(frame:frame);
     }
     init(in_level:Int, in_speed:Int, in_policy:MINE_POLICY, in_dimension:Int)
@@ -80,7 +80,7 @@ func gen_levels()
             policy = MINE_POLICY.GLOBAL;
         }
         
-        levels.append(Level(in_level: i, in_speed: speed, in_policy: policy, in_dimension: 3));
+        levels.append(Level(in_level: i, in_speed: speed, in_policy: policy, in_dimension: 4));
     }
     for(var i = 15; i < NUM_LEVELS * 2 / 3; ++i)
     {
@@ -128,7 +128,7 @@ func gen_levels()
             // global policy
             policy = MINE_POLICY.GLOBAL;
         }
-        levels.append(Level(in_level: i, in_speed: speed, in_policy: policy, in_dimension: 7));
+        levels.append(Level(in_level: i, in_speed: speed, in_policy: policy, in_dimension: 6));
     }
 }
 

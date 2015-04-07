@@ -215,7 +215,7 @@ class GameMap
         map.removeAll(keepCapacity: true);
         COUNT = 0;
         GAME_OVER = false;
-        START_LOC = Int(floor(Float(NUM_LOCS) / 2.0));
+        START_LOC = 0; // Int(floor(Float(NUM_LOCS) / 2.0));
         GAME_STARTED = false;
         
         var margin_height = (super_view.bounds.height - super_view.bounds.width) / 2.0;
@@ -334,7 +334,7 @@ class GameMap
             
             var offset_right = NSLayoutConstraint(item: size_button, attribute: NSLayoutAttribute.Right, relatedBy: NSLayoutRelation.Equal, toItem: super_view, attribute: NSLayoutAttribute.Right, multiplier: 1.0, constant: -off_const);
             
-            var num = 3 + (2*i);
+            var num = 6 - i;
             var dim_str = String(format: "%ix%i", num, num);
             size_button.setTitle(dim_str, forState: UIControlState.Normal);
             size_button.setTitleColor(UIColor.whiteColor(), forState: UIControlState.Normal);
@@ -437,10 +437,10 @@ class GameMap
     init()
     {
         NUM_ROWS = 4;
-        NUM_COLS = 6;
+        NUM_COLS = 4;
         COUNT = 0;
-        NUM_LOCS = 24;
-        START_LOC = Int(floor(Float(NUM_LOCS) / 2.0));
+        NUM_LOCS = 16;
+        START_LOC = 0; //Int(floor(Float(NUM_LOCS) / 2.0));
         GAME_STARTED = false;
         self.MINE_SPEED = 5;
         self.POLICY = MINE_POLICY.MIXED;
@@ -453,7 +453,7 @@ class GameMap
         COUNT = 0;
         GAME_OVER = false;
         NUM_LOCS = num_rows * num_cols;
-        START_LOC = Int(floor(Float(NUM_LOCS) / 2.0));
+        START_LOC = 0; // Int(floor(Float(NUM_LOCS) / 2.0));
         GAME_STARTED = false;
         self.MINE_SPEED = 5;
         self.POLICY = MINE_POLICY.MIXED;
@@ -678,7 +678,8 @@ class GameMap
                     next_game_win.won_game = true;
                     next_game_win.bring_up_window();
                 }
-                else if(!GAME_OVER)
+                else if((!GAME_OVER) && ((NUM_LOCS - COUNT) > 2))
+                    // mine will never fill last unexplored cell
                 {
                     generate_mines(self.POLICY, loc_id: loc_id);
                 }

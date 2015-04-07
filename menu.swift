@@ -117,7 +117,7 @@ class LevelMenu
             difficulty_bar.backgroundColor = UIColor.blackColor();
             difficulty_bar.setTranslatesAutoresizingMaskIntoConstraints(false);
             
-            difficulty_bar.text = String(format: "%iX%i", 3 + (i * 2), 3 + (i * 2));
+            difficulty_bar.text = String(format: "%iX%i", 4 + i, 4 + i);
             difficulty_bar.textAlignment = NSTextAlignment.Center;
             difficulty_bar.textColor = UIColor.whiteColor();
             

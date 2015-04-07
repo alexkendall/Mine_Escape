@@ -8,7 +8,7 @@
 import UIKit
 var super_view = UIView();
 var game:GameMap = GameMap();
-var DIM:Int = 3;
+var DIM:Int = 4;
 var level_menu:LevelMenu = LevelMenu();
 var current_level = 0;
 var levels_completed = Array<Int>(); // will store this in core data in future
