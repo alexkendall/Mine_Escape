@@ -104,12 +104,53 @@ class ViewController: UIViewController {
     }
     func next_level(sender:UIButton!)
     {
-        if(next_game_win.won_game)
+        if(sender.tag == 0) // clicked either next level or repeat level in pop-up window after finishing game
         {
-            current_level++;
+                if(next_game_win.won_game)
+                {
+                    if((current_level + 1) == NUM_LEVELS - 1)
+                    {
+                        // no more levels left to complete do something here
+                    }
+                    else
+                    {
+                        current_level++;
+                    }
+                }
+                next_game_win.bring_down_window();
+                viewDidLoad();
         }
+        else if(sender.tag == 1) // clicked next level button on bottom m
+        {
+            if((current_level + 1) == NUM_LEVELS - 1)
+            {
+                // no more levels left to complete do something here
+            }
+            else
+            {
+                ++current_level;
+            }
+            viewDidLoad();
+        }
+        else if(sender.tag == -1)
+        {
+            if((current_level - 1) < 0)
+            {
+                // not allowed
+            }
+            else
+            {
+                --current_level;
+            }
+            viewDidLoad();
+        }
+
+        
+    }
+    
+    func closed_window(sender:UIButton)
+    {
         next_game_win.bring_down_window();
-        viewDidLoad();
     }
 
     override func viewDidLoad()
@@ -119,6 +160,7 @@ class ViewController: UIViewController {
         super_view = self.view;
         super_view.backgroundColor = UIColor.blackColor(); // hide date and time
         super_view.setTranslatesAutoresizingMaskIntoConstraints(false);
+        next_game_win.bring_down_window();
         
         if(in_level_menu)
         {
@@ -135,10 +177,8 @@ class ViewController: UIViewController {
                 game.map[i].addTarget(self, action: "pressed_loc:", forControlEvents: UIControlEvents.TouchDown);
             }
         
-            game.new_game_button.addTarget(self, action: "reset", forControlEvents: UIControlEvents.TouchUpInside);
-            game.new_game_button.setTitleColor(UIColor.orangeColor(), forState: UIControlState.Highlighted);
             game.MENU_button.addTarget(self, action: "enter_level_menu", forControlEvents: UIControlEvents.TouchUpInside);
-            game.MENU_button.setTitleColor(UIColor.orangeColor(), forState: UIControlState.Highlighted);
+            game.MENU_button.setTitleColor(LIGHT_BLUE, forState: UIControlState.Highlighted);
         
             for(var i = 0; i < 3; ++i)
             {
@@ -150,8 +190,19 @@ class ViewController: UIViewController {
             
             // add button to enter main menu
             game.MAIN_MENU_button.addTarget(self, action: "entered_main:", forControlEvents: UIControlEvents.TouchUpInside);
-            game.MAIN_MENU_button.setTitleColor(UIColor.orangeColor(), forState: UIControlState.Highlighted);
+            game.MAIN_MENU_button.setTitleColor(LIGHT_BLUE, forState: UIControlState.Highlighted);
+            next_game_win.x_button.addTarget(self, action: "closed_window:", forControlEvents: UIControlEvents.TouchUpInside);
             next_game_win.next_level.addTarget(self, action: "next_level:", forControlEvents: UIControlEvents.TouchUpInside);
+            next_game_win.next_level.tag = 0;
+            
+            // add repeat, prev, and next actions
+            game.repeat_button.addTarget(self, action: "viewDidLoad", forControlEvents: UIControlEvents.TouchUpInside);
+            game.next_button.addTarget(self, action: "next_level:", forControlEvents: UIControlEvents.TouchUpInside);
+            game.prev_button.addTarget(self, action: "next_level:", forControlEvents: UIControlEvents.TouchUpInside);
+            
+            // tag next and previous
+            game.next_button.tag = 1;
+            game.prev_button.tag = -1;
             
         }
         else if(in_main_menu)

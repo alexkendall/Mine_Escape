@@ -9,6 +9,7 @@
 import UIKit
 enum MINE_POLICY{case LOCAL, GLOBAL, MIXED};
 var levels = Array<Level>();
+var NUM_LEVELS = 46;
 
 
 class Level:UIButton
@@ -76,6 +77,7 @@ class Next_Game
     var complete_container = UIView();
     var won_game = false;
     var next_level = UIButton();
+    var x_button = UIButton();
     
     func bring_up_window()
     {
@@ -101,7 +103,37 @@ class Next_Game
         super_view.addConstraint(centery);
         super_view.addConstraint(width_container);
         super_view.addConstraint(height_container);
-
+        
+        // add x button
+        x_button.setTranslatesAutoresizingMaskIntoConstraints(false);
+        x_button.setTitle("X", forState: UIControlState.Normal);
+        x_button.clipsToBounds = true;
+        x_button.layer.cornerRadius = 15.0;
+        x_button.layer.borderWidth = 1.0;
+        x_button.backgroundColor = UIColor.blackColor();
+        x_button.alpha = 0.85;
+        
+        if(self.won_game)
+        {
+            x_button.layer.borderColor = UIColor.orangeColor().CGColor;
+            x_button.setTitleColor(UIColor.orangeColor(), forState: UIControlState.Highlighted);
+        }
+        else
+        {
+            x_button.layer.borderColor = UIColor.redColor().CGColor;
+            x_button.setTitleColor(UIColor.redColor(), forState: UIControlState.Highlighted);
+        }
+        
+        // add constraints
+        var x_button_centery = NSLayoutConstraint(item: x_button, attribute: NSLayoutAttribute.CenterY, relatedBy: NSLayoutRelation.Equal, toItem: complete_container, attribute: NSLayoutAttribute.Top, multiplier: 1.0, constant: 0.0);
+        
+        var x_button_centerx = NSLayoutConstraint(item: x_button, attribute: NSLayoutAttribute.CenterX, relatedBy: NSLayoutRelation.Equal, toItem: complete_container, attribute: NSLayoutAttribute.Right, multiplier: 1.0, constant: 0.0);
+        
+        // conform hiearchy
+        super_view.addSubview(x_button);
+        super_view.addConstraint(x_button_centery);
+        super_view.addConstraint(x_button_centerx);
+        
         // add win or loss label
         
         var completed_label = UILabel();
@@ -144,17 +176,22 @@ class Next_Game
         }
         
         // add constraints
-        var centery_next_level = NSLayoutConstraint(item: next_level, attribute: NSLayoutAttribute.Top, relatedBy: NSLayoutRelation.Equal, toItem: complete_container, attribute: NSLayoutAttribute.Top, multiplier: 1.0, constant: width * 2.0 / 3.0);
+        var centery_next_level = NSLayoutConstraint(item: next_level, attribute: NSLayoutAttribute.Top, relatedBy: NSLayoutRelation.Equal, toItem: complete_container, attribute: NSLayoutAttribute.Top, multiplier: 1.0, constant: width * 3.0 / 5.0);
         
         // add constraints
         var centerx_next_level = NSLayoutConstraint(item: next_level, attribute: NSLayoutAttribute.CenterX, relatedBy: NSLayoutRelation.Equal, toItem: complete_container, attribute: NSLayoutAttribute.CenterX, multiplier: 1.0, constant: 0.0);
         
         var width_next_level = NSLayoutConstraint(item: next_level, attribute: NSLayoutAttribute.Width, relatedBy: NSLayoutRelation.Equal, toItem: complete_container, attribute: NSLayoutAttribute.Width, multiplier: 0.85, constant: 0.0);
         
+        var height_next_level = NSLayoutConstraint(item: next_level, attribute: NSLayoutAttribute.Top, relatedBy: NSLayoutRelation.Equal, toItem: next_level, attribute: NSLayoutAttribute.Bottom, multiplier: 1.0, constant: -40.0);
+        
         complete_container.addSubview(next_level);
         complete_container.addConstraint(centery_next_level);
         complete_container.addConstraint(centerx_next_level);
         complete_container.addConstraint(width_next_level);
+        complete_container.addConstraint(height_next_level);
+        
+        
     }
     func bring_down_window()
     {
@@ -163,6 +200,7 @@ class Next_Game
             complete_container.subviews[i].removeFromSuperview();
         }
         complete_container.removeFromSuperview();
+        x_button.removeFromSuperview();
     }
 }
 

@@ -165,7 +165,6 @@ class Mine_cell:UIButton
 class GameMap
 {
     var map = Array<Mine_cell>();
-    var new_game_button = UIButton();
     var bottom_text = UILabel();
     var NUM_ROWS:Int;
     var NUM_COLS:Int;
@@ -181,6 +180,9 @@ class GameMap
     var level_indicator:UILabel = UILabel();
     var level_no:Int = 0;
     var MAIN_MENU_button = UIButton();
+    var prev_button = UIButton();
+    var next_button = UIButton();
+    var repeat_button = UIButton();
     
     func remove_views()
     {
@@ -188,7 +190,6 @@ class GameMap
         {
             map[i].removeFromSuperview();
         }
-        new_game_button.removeFromSuperview();
         bottom_text.removeFromSuperview();
         for(var i = 0; i < size_buttons.count; ++i)
         {
@@ -197,6 +198,9 @@ class GameMap
         MENU_button.removeFromSuperview();
         level_indicator.removeFromSuperview();
         MAIN_MENU_button.removeFromSuperview();
+        repeat_button.removeFromSuperview();
+        prev_button.removeFromSuperview();
+        next_button.removeFromSuperview();
     }
     
     func create_game(rows:Int, cols:Int)
@@ -285,33 +289,21 @@ class GameMap
         self.bottom_text.textAlignment = NSTextAlignment.Center;
         self.bottom_text.font = UIFont(name: "Arial-BoldMT" , size: 35.0);
         
-        self.new_game_button.setTranslatesAutoresizingMaskIntoConstraints(false);
-        self.new_game_button.setTitleColor(UIColor.whiteColor(), forState: UIControlState.Normal);
-        var offset_x = NSLayoutConstraint(item: new_game_button, attribute: NSLayoutAttribute.Left, relatedBy: NSLayoutRelation.Equal, toItem: super_view, attribute: NSLayoutAttribute.Left, multiplier: 1.0, constant: 20.0);
-        
-        var offset_y = NSLayoutConstraint(item: new_game_button, attribute: NSLayoutAttribute.Bottom, relatedBy: NSLayoutRelation.Equal, toItem: super_view, attribute: NSLayoutAttribute.Bottom, multiplier: 1.0, constant: -15.0);
-        
-        super_view.addSubview(new_game_button);
-        super_view.addConstraint(offset_x);
-        super_view.addConstraint(offset_y);
-        new_game_button.setTitle("NEW GAME", forState: UIControlState.Normal);
-    
-        
         MENU_button.setTranslatesAutoresizingMaskIntoConstraints(false);
-        MENU_button.setTitle("LEVELS", forState: UIControlState.Normal);
-        MENU_button.setTitleColor(UIColor.whiteColor(), forState: UIControlState.Normal);
+        MENU_button.setTitle("LEVEL MENU", forState: UIControlState.Normal);
+        MENU_button.setTitleColor(UIColor.orangeColor(), forState: UIControlState.Normal);
         super_view.addSubview(MENU_button);
         
         var menu_offset_x = NSLayoutConstraint(item: MENU_button, attribute: NSLayoutAttribute.Left, relatedBy: NSLayoutRelation.Equal, toItem: super_view, attribute: NSLayoutAttribute.Left, multiplier: 1.0, constant: 20.0);
         
-        var offsety_menu = NSLayoutConstraint(item: MENU_button, attribute: NSLayoutAttribute.CenterY, relatedBy: NSLayoutRelation.Equal, toItem: new_game_button, attribute: NSLayoutAttribute.CenterY, multiplier: 1.0, constant: -20.0);
+        var offsety_menu = NSLayoutConstraint(item: MENU_button, attribute: NSLayoutAttribute.Top, relatedBy: NSLayoutRelation.Equal, toItem: super_view, attribute: NSLayoutAttribute.Top, multiplier: 1.0, constant: 45.0);
         
         super_view.addConstraint(menu_offset_x);
         super_view.addConstraint(offsety_menu);
         
         MAIN_MENU_button.setTranslatesAutoresizingMaskIntoConstraints(false);
         MAIN_MENU_button.setTitle("MAIN MENU", forState: UIControlState.Normal);
-        MAIN_MENU_button.setTitleColor(UIColor.whiteColor(), forState: UIControlState.Normal);
+        MAIN_MENU_button.setTitleColor(UIColor.orangeColor(), forState: UIControlState.Normal);
         super_view.addSubview(MAIN_MENU_button);
         
         var main_menu_offset_x = NSLayoutConstraint(item: MAIN_MENU_button, attribute: NSLayoutAttribute.Left, relatedBy: NSLayoutRelation.Equal, toItem: super_view, attribute: NSLayoutAttribute.Left, multiplier: 1.0, constant: 20.0);
@@ -330,7 +322,7 @@ class GameMap
             
             var off_const:CGFloat = 20.0 + (40.0 * CGFloat(i));
             
-            var csy = NSLayoutConstraint(item: size_button, attribute: NSLayoutAttribute.CenterY, relatedBy: NSLayoutRelation.Equal, toItem: new_game_button, attribute: NSLayoutAttribute.CenterY, multiplier: 1.0, constant: 0.0);
+            var csy = NSLayoutConstraint(item: size_button, attribute: NSLayoutAttribute.Bottom, relatedBy: NSLayoutRelation.Equal, toItem: super_view, attribute: NSLayoutAttribute.Bottom, multiplier: 1.0, constant: -20.0);
             
             
             var offset_right = NSLayoutConstraint(item: size_button, attribute: NSLayoutAttribute.Right, relatedBy: NSLayoutRelation.Equal, toItem: super_view, attribute: NSLayoutAttribute.Right, multiplier: 1.0, constant: -off_const);
@@ -349,15 +341,90 @@ class GameMap
         level_indicator.setTranslatesAutoresizingMaskIntoConstraints(false);
         super_view.addSubview(level_indicator);
         
-        var centery_li = NSLayoutConstraint(item: level_indicator, attribute: NSLayoutAttribute.CenterY, relatedBy: NSLayoutRelation.Equal, toItem: MENU_button, attribute: NSLayoutAttribute.CenterY, multiplier: 1.0, constant: 0.0);
+        var centery_li = NSLayoutConstraint(item: level_indicator, attribute: NSLayoutAttribute.CenterY, relatedBy: NSLayoutRelation.Equal, toItem: size_buttons[0], attribute: NSLayoutAttribute.CenterY, multiplier: 1.0, constant: 0.0);
         
-        var offset_rightli = NSLayoutConstraint(item: level_indicator, attribute: NSLayoutAttribute.Right, relatedBy: NSLayoutRelation.Equal, toItem: size_buttons[0], attribute: NSLayoutAttribute.Right, multiplier: 1.0, constant: 0.0);
+        var offset_left_li = NSLayoutConstraint(item: level_indicator, attribute: NSLayoutAttribute.Left, relatedBy: NSLayoutRelation.Equal, toItem: super_view, attribute: NSLayoutAttribute.Left, multiplier: 1.0, constant: 20.0);
         
         super_view.addConstraint(centery_li);
-        super_view.addConstraint(offset_rightli);
+        super_view.addConstraint(offset_left_li);
         level_indicator.text = String(format:"LEVEL %i", current_level);
-        level_indicator.textColor = UIColor.whiteColor();
+        level_indicator.textColor = LIGHT_BLUE;
+        
+        
+        var repeat_image = UIImage(named: "repeat_level");
+        var prev_image = UIImage(named: "prev_level");
+        var next_image = UIImage(named: "next_level");
+        
+        // create repeat button
+        repeat_button.setTranslatesAutoresizingMaskIntoConstraints(false);
+        repeat_button.setBackgroundImage(repeat_image, forState: UIControlState.Normal);
+        repeat_button.layer.borderWidth = 1.0;
+        repeat_button.layer.borderColor = UIColor.whiteColor().CGColor;
+        repeat_button.layer.backgroundColor = UIColor.blackColor().CGColor;
+        
+        var button_width:CGFloat = 40.0;
+        
+        //set constraints
+        var centerx_repeat = NSLayoutConstraint(item: repeat_button, attribute: NSLayoutAttribute.CenterX, relatedBy: NSLayoutRelation.Equal, toItem: super_view, attribute: NSLayoutAttribute.CenterX, multiplier: 1.0, constant: 0.0);
+        
+        var centery_repeat = NSLayoutConstraint(item: repeat_button, attribute: NSLayoutAttribute.Top, relatedBy: NSLayoutRelation.Equal, toItem: map[map.count - 1], attribute: NSLayoutAttribute.Bottom, multiplier: 1.0, constant: 15.0);
+    
+        var width_repeat = NSLayoutConstraint(item: repeat_button, attribute: NSLayoutAttribute.Right, relatedBy: NSLayoutRelation.Equal, toItem: repeat_button, attribute: NSLayoutAttribute.Left, multiplier: 1.0, constant: button_width);
+        
+        var height_repeat = NSLayoutConstraint(item: repeat_button, attribute: NSLayoutAttribute.Top, relatedBy: NSLayoutRelation.Equal, toItem: repeat_button, attribute: NSLayoutAttribute.Bottom, multiplier: 1.0, constant: -button_width);
+        
+        // configure hiearchy
+        super_view.addSubview(repeat_button);
+        super_view.addConstraint(centerx_repeat);
+        super_view.addConstraint(centery_repeat);
+        super_view.addConstraint(width_repeat);
+        super_view.addConstraint(height_repeat);
+        
+        // create previous button
+        prev_button.setTranslatesAutoresizingMaskIntoConstraints(false);
+        prev_button.setBackgroundImage(prev_image, forState: UIControlState.Normal);
+        prev_button.layer.borderWidth = 1.0;
+        prev_button.layer.borderColor = UIColor.whiteColor().CGColor;
+        prev_button.layer.backgroundColor = UIColor.blackColor().CGColor;
+        
+        //set constraints
+        var centerx_prev = NSLayoutConstraint(item: prev_button, attribute: NSLayoutAttribute.Right, relatedBy: NSLayoutRelation.Equal, toItem: repeat_button, attribute: NSLayoutAttribute.Left, multiplier: 1.0, constant: -15.0);
+        
+        var centery_prev = NSLayoutConstraint(item: prev_button, attribute: NSLayoutAttribute.CenterY, relatedBy: NSLayoutRelation.Equal, toItem: repeat_button, attribute: NSLayoutAttribute.CenterY, multiplier: 1.0, constant: 0.0);
+        
+        var width_prev = NSLayoutConstraint(item: prev_button, attribute: NSLayoutAttribute.Right, relatedBy: NSLayoutRelation.Equal, toItem: prev_button, attribute: NSLayoutAttribute.Left, multiplier: 1.0, constant: button_width);
+        
+        var height_prev = NSLayoutConstraint(item: prev_button, attribute: NSLayoutAttribute.Top, relatedBy: NSLayoutRelation.Equal, toItem: prev_button, attribute: NSLayoutAttribute.Bottom, multiplier: 1.0, constant: -button_width);
+        
+        // configure hiearchy
+        super_view.addSubview(prev_button);
+        super_view.addConstraint(centerx_prev);
+        super_view.addConstraint(centery_prev);
+        super_view.addConstraint(width_prev);
+        super_view.addConstraint(height_prev);
 
+        // create next button
+        next_button.setTranslatesAutoresizingMaskIntoConstraints(false);
+        next_button.setBackgroundImage(next_image, forState: UIControlState.Normal);
+        next_button.layer.borderWidth = 1.0;
+        next_button.layer.borderColor = UIColor.whiteColor().CGColor;
+        next_button.layer.backgroundColor = UIColor.blackColor().CGColor;
+        
+        //set constraints
+        var centerx_next = NSLayoutConstraint(item: next_button, attribute: NSLayoutAttribute.Left, relatedBy: NSLayoutRelation.Equal, toItem: repeat_button, attribute: NSLayoutAttribute.Right, multiplier: 1.0, constant: 15.0);
+        
+        var centery_next = NSLayoutConstraint(item: next_button, attribute: NSLayoutAttribute.CenterY, relatedBy: NSLayoutRelation.Equal, toItem: repeat_button, attribute: NSLayoutAttribute.CenterY, multiplier: 1.0, constant: 0.0);
+        
+        var width_next = NSLayoutConstraint(item: next_button, attribute: NSLayoutAttribute.Right, relatedBy: NSLayoutRelation.Equal, toItem: next_button, attribute: NSLayoutAttribute.Left, multiplier: 1.0, constant: button_width);
+        
+        var height_next = NSLayoutConstraint(item: next_button, attribute: NSLayoutAttribute.Top, relatedBy: NSLayoutRelation.Equal, toItem: next_button, attribute: NSLayoutAttribute.Bottom, multiplier: 1.0, constant: -button_width);
+        
+        // configure hiearchy
+        super_view.addSubview(next_button);
+        super_view.addConstraint(centerx_next);
+        super_view.addConstraint(centery_next);
+        super_view.addConstraint(width_next);
+        super_view.addConstraint(height_next);
     }
     init()
     {
