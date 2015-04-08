@@ -169,12 +169,14 @@ class Mine_cell:UIButton
 class GameMap
 {
     // sound variables
+    /*
     var mine_explosion = NSURL(fileURLWithPath: NSBundle.mainBundle().pathForResource("game_lost", ofType: "wav")!)
     var won_game_sound_path = NSURL(fileURLWithPath: NSBundle.mainBundle().pathForResource("won_game", ofType: "wav")!)
     var explore_sound_path = NSURL(fileURLWithPath: NSBundle.mainBundle().pathForResource("explore_thud", ofType: "wav")!)
     var won_game_player = AVAudioPlayer();
     var explosion_player = AVAudioPlayer();
     var explore_player = AVAudioPlayer();
+*/
 
     var map = Array<Mine_cell>();
     var NUM_ROWS:Int;
@@ -221,6 +223,7 @@ class GameMap
     
     func create_game(rows:Int, cols:Int)
     {
+        /*
         explosion_player = AVAudioPlayer(contentsOfURL: mine_explosion, error: nil);
         explosion_player.prepareToPlay();
         
@@ -233,7 +236,7 @@ class GameMap
         explore_player.volume = VOLUME_LEVEL;
         won_game_player.volume = VOLUME_LEVEL;
         explosion_player.volume = VOLUME_LEVEL;
-        
+        */
         
         NUM_ROWS = rows;
         NUM_COLS = cols;
@@ -673,14 +676,14 @@ class GameMap
                 map[loc_id].setTitleColor(UIColor.clearColor(), forState: UIControlState.Normal);
                 mark_location(loc_id);
                 map[loc_id].explored = true;
-                explore_player.play();
+                play_sound(SOUND.EXPLORED);
             }
         }
         else if(!GAME_OVER)
         {
             if(map[loc_id].mine_exists)
             {
-                explosion_player.play();
+                play_sound(SOUND.LOST);
             
                 // game is over
                 GAME_OVER = true;
@@ -696,12 +699,12 @@ class GameMap
             }
             else if(!map[loc_id].explored)
             {
-                explore_player.play();
+                play_sound(SOUND.EXPLORED);
                 map[loc_id].mark_explored();
                 ++COUNT;
                 if(won_game())
                 {
-                    won_game_player.play();
+                    play_sound(SOUND.WON);
                     
                     self.bottom_text.textColor = LIGHT_BLUE;
                     mark_completed();
