@@ -9,6 +9,7 @@
 //-------------------------------------------------------------------------
 
 import UIKit
+import AVFoundation
 var next_game_win = Next_Game();
 
 //-------------------------------------------------------------------------
@@ -17,6 +18,7 @@ var next_game_win = Next_Game();
 // colors
 let LIGHT_BLUE = UIColor(red: 0.0, green: 0.8, blue: 1.0, alpha: 1.0);
 let DARK_BLUE = UIColor(red: 0.0, green: 0.0, blue: 0.3, alpha: 1.0);
+
 let BLUE = UIColor.blueColor();
 
 //SPEED
@@ -24,11 +26,13 @@ enum SPEED{case SLOW, FAST};
 
 let NUM_SPEEDS:Int = 10;
 
+
 //-------------------------------------------------------------------------
 // CLASS THAT HOLDS DATA FOR EACH MINE CELL
 
 class Mine_cell:UIButton
 {
+
     var loc_id:Int;
     var mine_exists:Bool = false;
     var insignia:String = "";
@@ -164,6 +168,14 @@ class Mine_cell:UIButton
 
 class GameMap
 {
+    // sound variables
+    var mine_explosion = NSURL(fileURLWithPath: NSBundle.mainBundle().pathForResource("game_lost", ofType: "wav")!)
+    var won_game_sound_path = NSURL(fileURLWithPath: NSBundle.mainBundle().pathForResource("won_game", ofType: "wav")!)
+    var explore_sound_path = NSURL(fileURLWithPath: NSBundle.mainBundle().pathForResource("explore_thud", ofType: "wav")!)
+    var won_game_player = AVAudioPlayer();
+    var explosion_player = AVAudioPlayer();
+    var explore_player = AVAudioPlayer();
+    
     var map = Array<Mine_cell>();
     var NUM_ROWS:Int;
     var NUM_COLS:Int;
@@ -209,6 +221,16 @@ class GameMap
     
     func create_game(rows:Int, cols:Int)
     {
+        explosion_player = AVAudioPlayer(contentsOfURL: mine_explosion, error: nil);
+        explosion_player.prepareToPlay();
+        
+        won_game_player = AVAudioPlayer(contentsOfURL: won_game_sound_path, error: nil);
+        won_game_player.prepareToPlay();
+        
+        explore_player = AVAudioPlayer(contentsOfURL: explore_sound_path, error: nil);
+        explore_player.prepareToPlay();
+        
+        
         NUM_ROWS = rows;
         NUM_COLS = cols;
         NUM_LOCS = rows * cols;
@@ -647,12 +669,15 @@ class GameMap
                 map[loc_id].setTitleColor(UIColor.clearColor(), forState: UIControlState.Normal);
                 mark_location(loc_id);
                 map[loc_id].explored = true;
+                explore_player.play();
             }
         }
         else if(!GAME_OVER)
         {
             if(map[loc_id].mine_exists)
             {
+                explosion_player.play();
+            
                 // game is over
                 GAME_OVER = true;
                 end_game();
@@ -667,10 +692,13 @@ class GameMap
             }
             else if(!map[loc_id].explored)
             {
+                explore_player.play();
                 map[loc_id].mark_explored();
                 ++COUNT;
                 if(won_game())
                 {
+                    won_game_player.play();
+                    
                     self.bottom_text.textColor = LIGHT_BLUE;
                     mark_completed();
                     GAME_OVER = true;

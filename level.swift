@@ -11,6 +11,7 @@ enum MINE_POLICY{case LOCAL, GLOBAL, MIXED};
 var levels = Array<Level>();
 var NUM_LEVELS = 46;
 
+var VOLUME_LEVEL:Float = 1.0;
 
 class Level:UIButton
 {
