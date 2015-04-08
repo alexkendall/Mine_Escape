@@ -175,7 +175,7 @@ class GameMap
     var won_game_player = AVAudioPlayer();
     var explosion_player = AVAudioPlayer();
     var explore_player = AVAudioPlayer();
-    
+
     var map = Array<Mine_cell>();
     var NUM_ROWS:Int;
     var NUM_COLS:Int;
@@ -229,6 +229,10 @@ class GameMap
         
         explore_player = AVAudioPlayer(contentsOfURL: explore_sound_path, error: nil);
         explore_player.prepareToPlay();
+        
+        explore_player.volume = VOLUME_LEVEL;
+        won_game_player.volume = VOLUME_LEVEL;
+        explosion_player.volume = VOLUME_LEVEL;
         
         
         NUM_ROWS = rows;

@@ -538,3 +538,140 @@ class aboutWindow
         }
     }
 }
+
+class settingsWondow
+{
+    var background = UIView();
+    var back_button = UIButton();
+    var volume_slider = UISlider();
+    var volume_label = UILabel();
+    
+    func bring_up()
+    {
+        
+        background.setTranslatesAutoresizingMaskIntoConstraints(false);
+        
+        // generate constraints for background
+        var width = NSLayoutConstraint(item: background, attribute: NSLayoutAttribute.Width, relatedBy: NSLayoutRelation.Equal, toItem: super_view, attribute: NSLayoutAttribute.Width, multiplier: 1.0, constant: 0.0);
+        
+        var height = NSLayoutConstraint(item: background, attribute: NSLayoutAttribute.Height, relatedBy: NSLayoutRelation.Equal, toItem: super_view, attribute: NSLayoutAttribute.Height, multiplier: 1.0, constant: 0.0);
+        
+        var centerx = NSLayoutConstraint(item: background, attribute: NSLayoutAttribute.CenterX, relatedBy: NSLayoutRelation.Equal, toItem: super_view, attribute: NSLayoutAttribute.CenterX, multiplier: 1.0, constant: 0.0);
+        
+        var centery = NSLayoutConstraint(item: background, attribute: NSLayoutAttribute.CenterY, relatedBy: NSLayoutRelation.Equal, toItem: super_view, attribute: NSLayoutAttribute.CenterY, multiplier: 1.0, constant: 0.0);
+        
+        super_view.addSubview(background);
+        super_view.addConstraint(width);
+        super_view.addConstraint(height);
+        super_view.addConstraint(centerx);
+        super_view.addConstraint(centery);
+        
+        // set up gradiant
+        var colors = [UIColor.blackColor().CGColor, LIGHT_BLUE.CGColor];
+        var locations = [0, 1];
+        
+        var gradient = CAGradientLayer();
+        gradient.frame = super_view.bounds;
+        gradient.locations = locations;
+        gradient.colors = colors;
+        gradient.startPoint = CGPoint(x: 0.5, y: 0.0);
+        gradient.endPoint = CGPoint(x: 0.5, y: 1.0);
+        background.layer.insertSublayer(gradient, atIndex: 0);
+        
+        super_view.addSubview(background);
+        super_view.addConstraint(width);
+        super_view.addConstraint(height);
+        super_view.addConstraint(centerx);
+        super_view.addConstraint(centery);
+        
+        var baseline_height:CGFloat = 75.0;
+        var seperation:CGFloat = 50.0;
+        
+        // generate title subview
+        
+        var title = UILabel();
+        title.setTranslatesAutoresizingMaskIntoConstraints(false);
+        var centerx_title = NSLayoutConstraint(item: title, attribute: NSLayoutAttribute.CenterX, relatedBy: NSLayoutRelation.Equal, toItem: background, attribute: NSLayoutAttribute.CenterX, multiplier: 1.0, constant: 0.0);
+        var centery_title = NSLayoutConstraint(item: title, attribute: NSLayoutAttribute.Top, relatedBy: NSLayoutRelation.Equal, toItem: background, attribute: NSLayoutAttribute.Top, multiplier: 1.0, constant: baseline_height);
+        
+        // configure title subview
+        title.text = "VOLUME";
+        title.textColor = UIColor.orangeColor();
+        title.font = UIFont(name: "Arial", size: 30.0);
+        
+        // organize heiarchy
+        background.addSubview(title);
+        background.addConstraint(centerx_title);
+        background.addConstraint(centery_title);
+        
+        // configure volume slider
+        volume_slider.setTranslatesAutoresizingMaskIntoConstraints(false);
+        volume_slider.maximumValue = 1.0;
+        volume_slider.minimumValue = 0.0;
+        volume_slider.maximumTrackTintColor = LIGHT_BLUE;
+        volume_slider.minimumTrackTintColor = UIColor.orangeColor();
+        volume_slider.setValue(VOLUME_LEVEL, animated: false);
+        
+        var width_slider = NSLayoutConstraint(item: volume_slider, attribute: NSLayoutAttribute.Width, relatedBy: NSLayoutRelation.Equal, toItem: super_view, attribute: NSLayoutAttribute.Width, multiplier: 0.75, constant: 0.0);
+        
+        var height_slider = NSLayoutConstraint(item: volume_slider, attribute: NSLayoutAttribute.Top, relatedBy: NSLayoutRelation.Equal, toItem: volume_slider, attribute: NSLayoutAttribute.Bottom, multiplier: 1.0, constant: -40.0);
+        
+        var centerx_slider = NSLayoutConstraint(item: volume_slider, attribute: NSLayoutAttribute.CenterX, relatedBy: NSLayoutRelation.Equal, toItem: super_view, attribute: NSLayoutAttribute.CenterX, multiplier: 1.0, constant: 0.0);
+        
+        var centery_slider = NSLayoutConstraint(item: volume_slider, attribute: NSLayoutAttribute.CenterY, relatedBy: NSLayoutRelation.Equal, toItem: super_view, attribute: NSLayoutAttribute.CenterY, multiplier: 1.0, constant: 0.0);
+        
+        // organize hiearchy
+        super_view.addSubview(volume_slider);
+        super_view.addConstraint(width_slider);
+        super_view.addConstraint(height_slider);
+        super_view.addConstraint(centerx_slider);
+        super_view.addConstraint(centery_slider);
+        
+        
+        // configure volume label
+        volume_label.setTranslatesAutoresizingMaskIntoConstraints(false);
+        volume_label.backgroundColor = UIColor.orangeColor();
+        volume_label.layer.borderWidth = 2.0;
+        volume_label.layer.borderColor = UIColor.whiteColor().CGColor;
+        volume_label.text = String(Int(100.0 * VOLUME_LEVEL));
+        volume_label.textColor = UIColor.whiteColor();
+        volume_label.textAlignment = NSTextAlignment.Center;
+        volume_label.font = UIFont(name: "Arial", size: 30.0);
+        
+        var width_label = NSLayoutConstraint(item: volume_label, attribute: NSLayoutAttribute.Width, relatedBy: NSLayoutRelation.Equal, toItem: super_view, attribute: NSLayoutAttribute.Width, multiplier: 0.30, constant: 0.0);
+        
+        var height_label = NSLayoutConstraint(item: volume_label, attribute: NSLayoutAttribute.Height, relatedBy: NSLayoutRelation.Equal, toItem: super_view, attribute: NSLayoutAttribute.Height, multiplier: 0.2, constant: -10.0);
+        
+        var centerx_label = NSLayoutConstraint(item: volume_label, attribute: NSLayoutAttribute.CenterX, relatedBy: NSLayoutRelation.Equal, toItem: super_view, attribute: NSLayoutAttribute.CenterX, multiplier: 1.0, constant: 0.0);
+        
+        var centery_label = NSLayoutConstraint(item: volume_label, attribute: NSLayoutAttribute.Bottom, relatedBy: NSLayoutRelation.Equal, toItem: volume_slider, attribute: NSLayoutAttribute.Top, multiplier: 1.0, constant: -30.0);
+        
+        super_view.addSubview(volume_label);
+        super_view.addConstraint(width_label);
+        super_view.addConstraint(height_label);
+        super_view.addConstraint(centerx_label);
+        super_view.addConstraint(centery_label);
+        
+        // create back button
+        back_button = UIButton();
+        back_button.setTranslatesAutoresizingMaskIntoConstraints(false);
+        var left_back = NSLayoutConstraint(item: back_button, attribute: NSLayoutAttribute.Left, relatedBy: NSLayoutRelation.Equal, toItem: background, attribute: NSLayoutAttribute.Left, multiplier: 1.0, constant: 30.0);
+        var down_back = NSLayoutConstraint(item: back_button, attribute: NSLayoutAttribute.Bottom, relatedBy: NSLayoutRelation.Equal, toItem: background, attribute: NSLayoutAttribute.Bottom, multiplier: 1.0, constant: -25.0);
+        
+        // organize hiearchy
+        background.addSubview(back_button);
+        background.addConstraint(left_back);
+        background.addConstraint(down_back);
+        
+        back_button.setTitle("BACK", forState: UIControlState.Normal);
+        back_button.setTitleColor(UIColor.orangeColor(), forState: UIControlState.Highlighted);
+    }
+    func pull_down()
+    {
+        while(background.subviews.count > 0)
+        {
+            background.subviews.first?.removeFromSuperview();
+        }
+    }
+
+}

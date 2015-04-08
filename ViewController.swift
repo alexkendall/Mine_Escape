@@ -6,6 +6,7 @@
 //  Copyright (c) 2015 Alex Harrison. All rights reserved.
 //®
 import UIKit
+import AVFoundation
 var super_view = UIView();
 var game:GameMap = GameMap();
 var DIM:Int = 4;
@@ -18,12 +19,25 @@ var in_level_menu = false;
 var in_game = false;
 var in_how_to = false;
 var in_about = false;
+var in_volume = false;
 var how_to_screen = HowToScreen();
 var about_window:aboutWindow = aboutWindow();
+var settings_window:settingsWondow = settingsWondow();
+
+var default_sound_path = NSURL(fileURLWithPath: NSBundle.mainBundle().pathForResource("button_click", ofType: "wav")!)
+var default_player = AVAudioPlayer();
+
 class ViewController: UIViewController {
 
     override func prefersStatusBarHidden() -> Bool {
         return true;
+    }
+    
+    func play_thud()
+    {
+        default_player = AVAudioPlayer(contentsOfURL: default_sound_path, error: nil);
+        default_player.prepareToPlay();
+        default_player.play();
     }
     
     func pressed_loc(sender:Mine_cell!)
@@ -34,6 +48,7 @@ class ViewController: UIViewController {
     func reset()
     {
         game.bottom_text.text = "";
+        play_thud();
         viewDidLoad();
     }
     
@@ -47,11 +62,15 @@ class ViewController: UIViewController {
         in_how_to = false;
         in_main_menu = false;
         in_about = false;
+        in_volume = false;
+        play_thud();
         viewDidLoad();
+        
     }
     
     func enter_level_menu()
     {
+        play_thud();
         remove_subviews();
         level_menu.createMenu();
         for(var i = 0; i < level_menu.buttons.count; ++i)
@@ -62,6 +81,7 @@ class ViewController: UIViewController {
             level_menu.buttons[i].tag = i;
             level_menu.buttons[i].level = i;
         }
+        
     }
     
     func set_dimension(sender:UIButton!)
@@ -76,6 +96,7 @@ class ViewController: UIViewController {
     
     func exited_startup(sender:UIButton!)
     {
+        play_thud();
         if(sender.tag == 0)         // entered level menu
         {
             in_level_menu = true;
@@ -83,16 +104,18 @@ class ViewController: UIViewController {
             in_game = false;
             in_how_to = false;
             in_about = false;
+            in_volume = false;
             remove_subviews();
             viewDidLoad();
         }
         else if(sender.tag == 1)         // entered about menu
         {
+            in_about = true;
             in_level_menu = false;
             in_main_menu = false;
             in_game = false;
             in_how_to = false;
-            in_about = true;
+            in_volume = false;
             remove_subviews();
             about_window.bring_up();
             viewDidLoad();
@@ -104,23 +127,57 @@ class ViewController: UIViewController {
             in_game = false;
             in_main_menu = false;
             in_level_menu = false;
+            in_volume = false;
             remove_subviews();
             how_to_screen.bring_up();
+            viewDidLoad();
+        }
+        else if(sender.tag == 3)    // entered settings window
+        {
+            in_volume = true;
+            in_how_to = false;
+            in_main_menu = false;
+            in_game = false;
+            in_main_menu = false;
+            in_level_menu = false;
+            remove_subviews();
+            settings_window = settingsWondow();
+            settings_window.bring_up();
             viewDidLoad();
         }
     }
     
     func entered_startup(sender:UIButton!)
     {
-        in_game = false;
+        play_thud();
         in_main_menu = true;
+        in_game = false;
+        in_volume = false;
+        in_about = false;
+        in_level_menu = false;
+        in_how_to = false;
+        
+        about_window.pull_down();
         how_to_screen.pull_down();
-        remove_subviews();
+        settings_window.pull_down();
         main_menu.remove_main_menu();
+        remove_subviews();
         viewDidLoad();
     }
+    
+    func adjust_volume(sender:UISlider!)
+    {
+        
+        // update volume
+        VOLUME_LEVEL = sender.value;
+        
+        // change volume label
+        settings_window.volume_label.text = String(Int(100.0 * VOLUME_LEVEL));
+    }
+    
     func next_level(sender:UIButton!)
     {
+        play_thud();
         if(sender.tag == 0) // clicked either next level or repeat level in pop-up window after finishing game
         {
                 if(next_game_win.won_game)
@@ -176,7 +233,6 @@ class ViewController: UIViewController {
         super_view.backgroundColor = UIColor.blackColor(); // hide date and time
         super_view.setTranslatesAutoresizingMaskIntoConstraints(false);
         next_game_win.bring_down_window();
-        
 
         if(in_level_menu)
         {
@@ -213,6 +269,7 @@ class ViewController: UIViewController {
             
             // add repeat, prev, and next actions
             game.repeat_button.addTarget(self, action: "viewDidLoad", forControlEvents: UIControlEvents.TouchUpInside);
+            game.repeat_button.addTarget(self, action: "play_thud", forControlEvents: UIControlEvents.TouchUpInside);
             game.next_button.addTarget(self, action: "next_level:", forControlEvents: UIControlEvents.TouchUpInside);
             game.prev_button.addTarget(self, action: "next_level:", forControlEvents: UIControlEvents.TouchUpInside);
             
@@ -240,6 +297,11 @@ class ViewController: UIViewController {
         else if(in_about)
         {
             about_window.back_button.addTarget(self, action: "entered_startup:", forControlEvents: UIControlEvents.TouchUpInside);
+        }
+        else if(in_volume)
+        {
+            settings_window.back_button.addTarget(self, action: "entered_startup:", forControlEvents: UIControlEvents.TouchUpInside);
+            settings_window.volume_slider.addTarget(self, action: "adjust_volume:", forControlEvents: UIControlEvents.ValueChanged);
         }
     }
     override func didReceiveMemoryWarning() {
