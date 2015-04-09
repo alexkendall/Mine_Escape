@@ -9,8 +9,8 @@
 import UIKit
 enum MINE_POLICY{case LOCAL, GLOBAL, MIXED};
 var levels = Array<Level>();
-var NUM_LEVELS = 46;
-
+let NUM_LEVELS = 125;
+let NUM_MEGA_LEVELS = 5;
 var VOLUME_LEVEL:Float = 1.0;
 
 class Level:UIButton
@@ -58,78 +58,35 @@ class Level:UIButton
 
 func gen_levels()
 {
-    for(var i = 0; i < NUM_LEVELS / 3; ++i)
+    let NUM_SUB_LEVELS = NUM_LEVELS / NUM_MEGA_LEVELS;
+    for(var mega = 0; mega < NUM_MEGA_LEVELS; ++mega)
     {
-        // determine mine speed
-        var speed = Int(ceil((Double(i)) / (Double(NUM_LEVELS) / 3.0) * 10.0));
-        
-        // determine mine policy
-        var policy:MINE_POLICY;
-        if(i < (NUM_LEVELS / 3 / 3))
+        for(var i = 0; i < NUM_SUB_LEVELS; ++i)
         {
-            // local policy
-            policy = MINE_POLICY.LOCAL;
+            // determine mine speed
+            var speed = Int(ceil((Double(i)) / Double(NUM_SUB_LEVELS) * 10.0));
+            //println(speed);
+            
+            // determine mine policy
+            var policy:MINE_POLICY;
+            if(i < (NUM_SUB_LEVELS / 3))
+            {
+                // local policy
+                policy = MINE_POLICY.LOCAL;
+            }
+            else if (i < (NUM_LEVELS * 2 / 3))
+            {
+                // mixed policy
+                policy = MINE_POLICY.MIXED;
+            }
+            else
+            {
+                // global policy
+                policy = MINE_POLICY.GLOBAL;
+            }
+            var level_no = (mega * NUM_SUB_LEVELS) + i;
+            levels.append(Level(in_level: level_no, in_speed: speed, in_policy: policy, in_dimension: 4 + mega));
         }
-        else if (i < (NUM_LEVELS / 3 * 2 / 3))
-        {
-            // mixed policy
-            policy = MINE_POLICY.MIXED;
-        }
-        else
-        {
-            // global policy
-            policy = MINE_POLICY.GLOBAL;
-        }
-        
-        levels.append(Level(in_level: i, in_speed: speed, in_policy: policy, in_dimension: 4));
-    }
-    for(var i = 15; i < NUM_LEVELS * 2 / 3; ++i)
-    {
-        // determine mine speed
-        var speed = Int(ceil((Double(i) - 15.0) / (Double(NUM_LEVELS) / 3.0) * 10.0));
-        
-        // determine mine policy
-        var policy:MINE_POLICY;
-        if((i-15) < (NUM_LEVELS / 3 / 3))
-        {
-            // local policy
-            policy = MINE_POLICY.LOCAL;
-        }
-        else if ((i-15) < (NUM_LEVELS / 3 * 2 / 3))
-        {
-            // mixed policy
-            policy = MINE_POLICY.MIXED;
-        }
-        else
-        {
-            // global policy
-            policy = MINE_POLICY.GLOBAL;
-        }
-        levels.append(Level(in_level: i, in_speed: speed, in_policy: policy, in_dimension: 5));
-    }
-    for(var i = 30; i < NUM_LEVELS; ++i)
-    {
-        // determine mine speed
-        var speed = Int(ceil((Double(i) - 30.0) / (Double(NUM_LEVELS) / 3.0) * 10.0));
-        
-        // determine mine policy
-        var policy:MINE_POLICY;
-        if((i-30) < (NUM_LEVELS / 3 / 3))
-        {
-            // local policy
-            policy = MINE_POLICY.LOCAL;
-        }
-        else if ((i-30) < (NUM_LEVELS / 3 * 2 / 3))
-        {
-            // mixed policy
-            policy = MINE_POLICY.MIXED;
-        }
-        else
-        {
-            // global policy
-            policy = MINE_POLICY.GLOBAL;
-        }
-        levels.append(Level(in_level: i, in_speed: speed, in_policy: policy, in_dimension: 6));
     }
 }
 
@@ -143,6 +100,7 @@ class Next_Game
     
     func bring_up_window()
     {
+        
         // create container to hold next level buttn
         var width = super_view.bounds.width * 0.75;
         complete_container.layer.borderWidth = 1.0;

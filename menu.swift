@@ -34,17 +34,19 @@ class level_button:UIButton
         self.level = in_level;
         self.progress = in_progress;
         super.init();
+        self.level = in_level;
     }
     func update_progress()
     {
         for(var i = 0; i < level_status_indicator.count; ++i)
         {
-            level_status_indicator[i].backgroundColor = UIColor.orangeColor();
+            level_status_indicator[i].backgroundColor = UIColor.greenColor();
             level_status_indicator[i].layer.borderWidth = 0.5;
         }
     }
 }
 
+/*
 class LevelMenu
 {
     var buttons:Array<level_button> = Array<level_button>();
@@ -209,6 +211,7 @@ class LevelMenu
         }
     }
 }
+*/
 
 class Main_menu
 {
@@ -674,4 +677,201 @@ class settingsWondow
         }
     }
 
+}
+
+class LevelMenu
+{
+    var NUM_MEGA_LEVELS = 5;    // 4X4, 5X5, 6X6, 7X7, 8X8
+    var NUM_SUB_LEVELS = 25;     // 16 sublevels per megalevel
+    var scroll_view = UITextView();
+    var level_buttons = Array<level_button>();
+    var background = UIView();
+    var tabs = Array<UILabel>();
+    
+    func removeMenu()
+    {
+        for(var i = 0; i < level_buttons.count; ++i)
+        {
+            level_buttons[i].removeFromSuperview();
+        }
+        level_buttons.removeAll(keepCapacity: true);
+        for(var i = 0; i < tabs.count; ++i)
+        {
+            tabs[i].removeFromSuperview();
+        }
+        tabs.removeAll(keepCapacity: true);
+        background.removeFromSuperview();
+    }
+    
+    func createMenu()
+    {
+        scroll_view.scrollEnabled = false;
+        scroll_view.text = "..................................................................................................................................................";
+        scroll_view.font = UIFont(name: "Arial", size: 109.0);
+        scroll_view.textColor = UIColor.clearColor();
+        // configure background
+        
+        background.setTranslatesAutoresizingMaskIntoConstraints(false);
+        background.backgroundColor = LIGHT_BLUE;
+        // generate constraints for background
+        var width = NSLayoutConstraint(item: background, attribute: NSLayoutAttribute.Width, relatedBy: NSLayoutRelation.Equal, toItem: super_view, attribute: NSLayoutAttribute.Width, multiplier: 1.0, constant: 0.0);
+        
+        var height = NSLayoutConstraint(item: background, attribute: NSLayoutAttribute.Height, relatedBy: NSLayoutRelation.Equal, toItem: super_view, attribute: NSLayoutAttribute.Height, multiplier: 1.0, constant: 0.0);
+        
+        var centerx = NSLayoutConstraint(item: background, attribute: NSLayoutAttribute.CenterX, relatedBy: NSLayoutRelation.Equal, toItem: super_view, attribute: NSLayoutAttribute.CenterX, multiplier: 1.0, constant: 0.0);
+        
+        var centery = NSLayoutConstraint(item: background, attribute: NSLayoutAttribute.CenterY, relatedBy: NSLayoutRelation.Equal, toItem: super_view, attribute: NSLayoutAttribute.CenterY, multiplier: 1.0, constant: 0.0);
+        
+        super_view.addSubview(background);
+        super_view.addConstraint(width);
+        super_view.addConstraint(height);
+        super_view.addConstraint(centerx);
+        super_view.addConstraint(centery);
+        
+        // set up gradiant
+        var colors = [UIColor.blackColor().CGColor, LIGHT_BLUE.CGColor];
+        var locations = [0, 1];
+        
+        var gradient = CAGradientLayer();
+        gradient.frame = super_view.bounds;
+        gradient.locations = locations;
+        gradient.colors = colors;
+        gradient.startPoint = CGPoint(x: 0.5, y: 0.0);
+        gradient.endPoint = CGPoint(x: 0.5, y: 1.0);
+        background.layer.insertSublayer(gradient, atIndex: 0);
+        
+        super_view.addSubview(background);
+        super_view.addConstraint(width);
+        super_view.addConstraint(height);
+        super_view.addConstraint(centerx);
+        super_view.addConstraint(centery);
+
+        // configure scroll view
+        
+        var scroll_width = NSLayoutConstraint(item: scroll_view, attribute: NSLayoutAttribute.Width, relatedBy: NSLayoutRelation.Equal, toItem: background, attribute: NSLayoutAttribute.Width, multiplier: 0.9, constant: 0.0);
+        
+        var scroll_height = NSLayoutConstraint(item: scroll_view, attribute: NSLayoutAttribute.Height, relatedBy: NSLayoutRelation.Equal, toItem: background, attribute: NSLayoutAttribute.Height, multiplier: 1.0, constant: 0.0);
+        
+        var scroll_centerx = NSLayoutConstraint(item: scroll_view, attribute: NSLayoutAttribute.CenterX, relatedBy: NSLayoutRelation.Equal, toItem: background, attribute: NSLayoutAttribute.CenterX, multiplier: 1.0, constant: 0.0);
+        
+        var scroll_centery = NSLayoutConstraint(item: scroll_view, attribute: NSLayoutAttribute.CenterY, relatedBy: NSLayoutRelation.Equal, toItem: background, attribute: NSLayoutAttribute.CenterY, multiplier: 1.0, constant: 0.0);
+        
+        scroll_view.setTranslatesAutoresizingMaskIntoConstraints(false);
+        scroll_view.backgroundColor = UIColor.clearColor();
+        scroll_view.layer.borderColor = UIColor.whiteColor().CGColor;
+        scroll_view.layer.borderWidth = 1.0;
+        scroll_view.frame = super_view.bounds;
+        super_view.addSubview(scroll_view);
+        super_view.addConstraint(scroll_width);
+        super_view.addConstraint(scroll_height);
+        super_view.addConstraint(scroll_centerx);
+        super_view.addConstraint(scroll_centery);
+        
+        
+        var dimension:Int = Int(sqrt(Float(NUM_SUB_LEVELS)));
+        var mega_width = super_view.bounds.width * 0.9;
+        var mega_height = mega_width;
+        var sub_height = mega_height / CGFloat(dimension);
+        var sub_width = mega_width / CGFloat(dimension);
+        
+        var margin:CGFloat = 40.0;
+        scroll_view.clipsToBounds = false;
+
+        for(var i = 0; i < NUM_MEGA_LEVELS; ++i)
+        {
+            // configure tab properties
+            var tab = UILabel();
+            var current_dim = 4 + i;
+            tab.backgroundColor = UIColor.whiteColor();
+            tab.setTranslatesAutoresizingMaskIntoConstraints(false);
+            tab.text = String(format: "%i X %i", current_dim, current_dim);
+            tab.textAlignment = NSTextAlignment.Center;
+            tab.textColor = UIColor.blackColor();
+            tabs.append(tab);
+            
+            // configure constraints
+            var baseline = ((margin + mega_height) * CGFloat(i));
+            
+            var tab_x = NSLayoutConstraint(item:tab, attribute: NSLayoutAttribute.CenterX , relatedBy: NSLayoutRelation.Equal, toItem: scroll_view, attribute: NSLayoutAttribute.CenterX, multiplier: 1.0, constant: 0.0);
+            
+            var tab_y = NSLayoutConstraint(item:tab, attribute: NSLayoutAttribute.Top, relatedBy: NSLayoutRelation.Equal, toItem: scroll_view, attribute: NSLayoutAttribute.Top, multiplier: 1.0, constant: baseline);
+            
+            var tab_width = NSLayoutConstraint(item:tab, attribute: NSLayoutAttribute.Width, relatedBy: NSLayoutRelation.Equal, toItem: scroll_view, attribute: NSLayoutAttribute.Width, multiplier: 1.0, constant: 0.0);
+            
+            var tab_height = NSLayoutConstraint(item:tab, attribute: NSLayoutAttribute.Height, relatedBy: NSLayoutRelation.Equal, toItem: tab, attribute: NSLayoutAttribute.Height, multiplier: 0, constant: margin);
+            
+            
+            scroll_view.addSubview(tab);
+            scroll_view.addConstraint(tab_x);
+            scroll_view.addConstraint(tab_y);
+            scroll_view.addConstraint(tab_width);
+            scroll_view.addConstraint(tab_height);
+            
+            
+            for(var col = 0; col < dimension; ++col)
+            {
+                for(var row = 0; row < dimension; ++row)
+                {
+                    // configure level button properties
+                    var level_but:level_button = level_button(in_level: (i * (NUM_SUB_LEVELS)) + (dimension * row) + col, in_progress: 0);
+                    level_but.backgroundColor = UIColor(red: 0.0, green: 0.0, blue: 0.0, alpha: 0.75);
+                    level_but.layer.borderWidth = 1.0;
+                    level_but.layer.borderColor = UIColor.whiteColor().CGColor;
+                    level_but.clipsToBounds = false;
+                    level_but.setTranslatesAutoresizingMaskIntoConstraints(false);
+                    level_but.setTitle(String(level_but.level), forState: UIControlState.Normal);
+                    
+                    var baseline = margin + ((margin + mega_height) * CGFloat(i)) + (CGFloat(row) * sub_height);
+                    
+                    var level_center_x = NSLayoutConstraint(item:level_but, attribute: NSLayoutAttribute.Left, relatedBy: NSLayoutRelation.Equal, toItem: scroll_view, attribute: NSLayoutAttribute.Left, multiplier: 1.0, constant: CGFloat(col) * sub_width);
+                    
+                    var level_center_y = NSLayoutConstraint(item:level_but, attribute: NSLayoutAttribute.Top, relatedBy: NSLayoutRelation.Equal, toItem: scroll_view, attribute: NSLayoutAttribute.Top, multiplier: 1.0, constant: baseline);
+                    
+                    var level_width = NSLayoutConstraint(item:level_but, attribute: NSLayoutAttribute.Width, relatedBy: NSLayoutRelation.Equal, toItem: scroll_view, attribute: NSLayoutAttribute.Width, multiplier: 1.0 / CGFloat(dimension), constant: 0.0);
+                    
+                    var level_height = NSLayoutConstraint(item:level_but, attribute: NSLayoutAttribute.Height, relatedBy: NSLayoutRelation.Equal, toItem: scroll_view, attribute: NSLayoutAttribute.Width, multiplier: 1.0 / CGFloat(dimension), constant: 0.0);
+                    
+                    scroll_view.addSubview(level_but);
+                    scroll_view.addConstraint(level_center_x);
+                    scroll_view.addConstraint(level_center_y);
+                    scroll_view.addConstraint(level_width);
+                    scroll_view.addConstraint(level_height);
+                    level_buttons.append(level_but);
+                    
+                    for(var j = 0; j < 1; ++j)  // generate status
+                    {
+                        var level_status = UIView();
+                        level_status.setTranslatesAutoresizingMaskIntoConstraints(false);
+                        level_status.backgroundColor = UIColor.clearColor();
+                        
+                        var num_cols = 5;
+                        var left_const = super_view.frame.width / CGFloat(num_cols) / 3.0 * CGFloat(j);
+                        
+                        var status_height_constr = NSLayoutConstraint(item: level_status, attribute: NSLayoutAttribute.Height, relatedBy: NSLayoutRelation.Equal, toItem: level_but, attribute: NSLayoutAttribute.Height, multiplier: 0.15, constant: 0.0);
+                        
+                        var status_width_constr = NSLayoutConstraint(item: level_status, attribute: NSLayoutAttribute.Width, relatedBy: NSLayoutRelation.Equal, toItem: level_but, attribute: NSLayoutAttribute.Width, multiplier: 1.0, constant: 0.0);
+                        
+                        var status_left = NSLayoutConstraint(item: level_status, attribute: NSLayoutAttribute.Left, relatedBy: NSLayoutRelation.Equal, toItem: level_but, attribute: NSLayoutAttribute.Left, multiplier: 1.0, constant: left_const);
+                        
+                        var status_bottom = NSLayoutConstraint(item: level_status, attribute: NSLayoutAttribute.Bottom, relatedBy: NSLayoutRelation.Equal, toItem: level_but, attribute: NSLayoutAttribute.Bottom, multiplier: 1.0, constant: 0.0);
+                        
+                        level_but.addSubview(level_status);
+                        level_but.addConstraint(status_left);
+                        level_but.addConstraint(status_bottom);
+                        level_but.addConstraint(status_height_constr);
+                        level_but.addConstraint(status_width_constr);
+                        level_but.level_status_indicator.append(level_status);
+                    }
+
+                }
+            }
+            
+        }
+        scroll_view.scrollEnabled = true;
+        for(var i = 0; i < levels_completed.count; ++i)
+        {
+            level_buttons[levels_completed[i]].update_progress();
+        }
+    }
+    
 }

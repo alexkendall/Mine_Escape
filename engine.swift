@@ -293,15 +293,15 @@ class GameMap
         self.map[self.START_LOC].setTitleColor(UIColor.blackColor(), forState: UIControlState.Normal);
         self.map[self.START_LOC].setTitle("START", forState: UIControlState.Normal);
         
-        if(NUM_ROWS == 7)
+        if(NUM_ROWS > 6)
         {
-            self.map[self.START_LOC].titleLabel?.font = UIFont(name: "Arial-BoldMT" , size: 10.0);
+            self.map[self.START_LOC].titleLabel?.font = UIFont(name: "Arial-BoldMT" , size: 12.0);
         }
-        else if(NUM_ROWS == 5)
+        if(NUM_ROWS == 5)
         {
             self.map[self.START_LOC].titleLabel?.font = UIFont(name: "Arial-BoldMT" , size: 15.0);
         }
-        else
+        if(NUM_ROWS == 4)
         {
             self.map[self.START_LOC].titleLabel?.font = UIFont(name: "Arial-BoldMT" , size: 18.0);
         }
@@ -350,7 +350,7 @@ class GameMap
         super_view.addConstraint(main_offsety_menu);
         
         
-        for(var i = 0; i < 3; ++i)
+        for(var i = 0; i < NUM_MEGA_LEVELS; ++i)
         {
             var size_button = UIButton();
             size_button.setTranslatesAutoresizingMaskIntoConstraints(false);
@@ -363,7 +363,7 @@ class GameMap
             
             var offset_right = NSLayoutConstraint(item: size_button, attribute: NSLayoutAttribute.Right, relatedBy: NSLayoutRelation.Equal, toItem: super_view, attribute: NSLayoutAttribute.Right, multiplier: 1.0, constant: -off_const);
             
-            var num = 6 - i;
+            var num = 8 - i;
             var dim_str = String(format: "%ix%i", num, num);
             size_button.setTitle(dim_str, forState: UIControlState.Normal);
             size_button.setTitleColor(UIColor.whiteColor(), forState: UIControlState.Normal);

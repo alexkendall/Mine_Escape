@@ -23,6 +23,7 @@ var in_volume = false;
 var how_to_screen = HowToScreen();
 var about_window:aboutWindow = aboutWindow();
 var settings_window:settingsWondow = settingsWondow();
+//var temporary_menu = temp_menu();
 
 class ViewController: UIViewController {
 
@@ -61,13 +62,13 @@ class ViewController: UIViewController {
         play_sound(SOUND.DEFAULT);
         remove_subviews();
         level_menu.createMenu();
-        for(var i = 0; i < level_menu.buttons.count; ++i)
+        for(var i = 0; i < level_menu.level_buttons.count; ++i)
         {
-            level_menu.buttons[i].addTarget(self, action: "load_level:", forControlEvents: UIControlEvents.TouchUpInside);
-            level_menu.buttons[i].setTitleColor(UIColor.whiteColor(), forState: UIControlState.Highlighted);
-            level_menu.buttons[i].setTitleShadowColor(UIColor.whiteColor(), forState: UIControlState.Highlighted);
-            level_menu.buttons[i].tag = i;
-            level_menu.buttons[i].level = i;
+            level_menu.level_buttons[i].addTarget(self, action: "load_level:", forControlEvents: UIControlEvents.TouchUpInside);
+            level_menu.level_buttons[i].setTitleColor(UIColor.whiteColor(), forState: UIControlState.Highlighted);
+            level_menu.level_buttons[i].setTitleShadowColor(UIColor.whiteColor(), forState: UIControlState.Highlighted);
+            level_menu.level_buttons[i].tag = i;
+            level_menu.level_buttons[i].level = i;
         }
         
     }
@@ -228,6 +229,8 @@ class ViewController: UIViewController {
         super_view.setTranslatesAutoresizingMaskIntoConstraints(false);
         next_game_win.bring_down_window();
 
+        //temporary_menu.bring_up();
+    
         if(in_level_menu)
         {
             enter_level_menu();
@@ -246,7 +249,7 @@ class ViewController: UIViewController {
             game.level_button.addTarget(self, action: "enter_level_menu", forControlEvents: UIControlEvents.TouchUpInside);
             game.level_button.setTitleColor(LIGHT_BLUE, forState: UIControlState.Highlighted);
         
-            for(var i = 0; i < 3; ++i)
+            for(var i = 0; i < NUM_MEGA_LEVELS; ++i)
             {
                 if(game.size_buttons[i].tag == DIM)
                 {
@@ -298,6 +301,7 @@ class ViewController: UIViewController {
             settings_window.volume_slider.addTarget(self, action: "adjust_volume:", forControlEvents: UIControlEvents.ValueChanged);
             settings_window.volume_slider.addTarget(self, action: "demonstrate_volume:", forControlEvents: UIControlEvents.TouchUpInside);
         }
+        
     }
     override func didReceiveMemoryWarning() {
         super.didReceiveMemoryWarning()
