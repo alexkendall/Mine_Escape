@@ -10,7 +10,8 @@
 
 import UIKit
 import AVFoundation
-var next_game_win = Next_Game();
+import Foundation;
+var next_game_win = NextGameWindow();
 
 //-------------------------------------------------------------------------
 // GLOBAL VARIABLES
@@ -168,16 +169,7 @@ class Mine_cell:UIButton
 
 class GameMap
 {
-    // sound variables
-    /*
-    var mine_explosion = NSURL(fileURLWithPath: NSBundle.mainBundle().pathForResource("game_lost", ofType: "wav")!)
-    var won_game_sound_path = NSURL(fileURLWithPath: NSBundle.mainBundle().pathForResource("won_game", ofType: "wav")!)
-    var explore_sound_path = NSURL(fileURLWithPath: NSBundle.mainBundle().pathForResource("explore_thud", ofType: "wav")!)
-    var won_game_player = AVAudioPlayer();
-    var explosion_player = AVAudioPlayer();
-    var explore_player = AVAudioPlayer();
-*/
-
+    var game_timer = NSTimer();
     var map = Array<Mine_cell>();
     var NUM_ROWS:Int;
     var NUM_COLS:Int;
@@ -660,9 +652,9 @@ class GameMap
     
     func mark_completed()
     {
-        if(find(levels_completed, level_no) == nil)
+        if(find(levels_completed, current_level) == nil)
         {
-            levels_completed.append(level_no);
+            levels_completed.append(current_level);
         }
     }
     
@@ -677,6 +669,8 @@ class GameMap
                 mark_location(loc_id);
                 map[loc_id].explored = true;
                 play_sound(SOUND.EXPLORED);
+                
+                // begin game timer
             }
         }
         else if(!GAME_OVER)
@@ -693,7 +687,6 @@ class GameMap
                 map[loc_id].layer.borderWidth = 1.0;
                 map[loc_id].layer.borderColor = UIColor.whiteColor().CGColor;
                 map[loc_id].set_image("mine_white");
-                //self.bottom_text.textColor = UIColor.redColor();
                 next_game_win.won_game = false;
                 next_game_win.bring_up_window();
             }
@@ -708,6 +701,7 @@ class GameMap
                     
                     self.bottom_text.textColor = LIGHT_BLUE;
                     mark_completed();
+                    println("leve")
                     GAME_OVER = true;
                     end_game();
                     next_game_win.won_game = true;

@@ -22,8 +22,7 @@ var in_about = false;
 var in_volume = false;
 var how_to_screen = HowToScreen();
 var about_window:aboutWindow = aboutWindow();
-var settings_window:settingsWondow = settingsWondow();
-//var temporary_menu = temp_menu();
+var settings_window:settingsWindow = settingsWindow();
 
 class ViewController: UIViewController {
 
@@ -130,7 +129,7 @@ class ViewController: UIViewController {
             in_main_menu = false;
             in_level_menu = false;
             remove_subviews();
-            settings_window = settingsWondow();
+            settings_window = settingsWindow();
             settings_window.bring_up();
             viewDidLoad();
         }
@@ -146,6 +145,7 @@ class ViewController: UIViewController {
         in_level_menu = false;
         in_how_to = false;
         
+        level_menu.removeMenu();
         about_window.pull_down();
         how_to_screen.pull_down();
         settings_window.pull_down();
@@ -234,6 +234,7 @@ class ViewController: UIViewController {
         if(in_level_menu)
         {
             enter_level_menu();
+            level_menu.back_button.addTarget(self, action: "entered_startup:", forControlEvents: UIControlEvents.TouchUpInside);
         }
         else if(in_game)
         {

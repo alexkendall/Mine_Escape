@@ -13,41 +13,31 @@ let NUM_LEVELS = 125;
 let NUM_MEGA_LEVELS = 5;
 var VOLUME_LEVEL:Float = 1.0;
 
+
+// LEVEL CLASS THAT HOLDS LEVEL DIM, SPEED, POLICY DATA
 class Level:UIButton
 {
-    var level:Int;
-    var speed:Int;
-    var policy:MINE_POLICY;
-    var dimension:Int;
+    var level:Int = 0;
+    var speed:Int = 0;
+    var policy:MINE_POLICY = MINE_POLICY.LOCAL;
+    var dimension:Int = 4;
+    var best_time:String = "N/A";
+    var progress:Int = 0;
+    
     override init()
     {
-        self.level = 0;
-        self.speed = 0;
-        self.policy = MINE_POLICY.LOCAL;
-        self.dimension = 4;
-        
         super.init();
     }
-    required init(coder aDecoder: NSCoder) {
-        self.level = 0;
-        self.speed = 0;
-        self.policy = MINE_POLICY.LOCAL;
-        self.dimension = 4;
+    required init(coder aDecoder: NSCoder)
+    {
         super.init();
     }
-    override init(frame: CGRect) {
-        self.level = 0;
-        self.speed = 0;
-        self.policy = MINE_POLICY.LOCAL;
-        self.dimension = 4;
+    override init(frame: CGRect)
+    {
         super.init(frame:frame);
     }
     init(in_level:Int, in_speed:Int, in_policy:MINE_POLICY, in_dimension:Int)
     {
-        self.level = in_level;
-        self.speed = in_speed;
-        self.policy = in_policy;
-        self.dimension = in_dimension;
         super.init();
         self.dimension = in_dimension;
         self.policy = in_policy;
@@ -56,6 +46,7 @@ class Level:UIButton
     }
 }
 
+// GENERATES LEVELS OF INCREASING DIFFICULTY
 func gen_levels()
 {
     let NUM_SUB_LEVELS = NUM_LEVELS / NUM_MEGA_LEVELS;
@@ -90,7 +81,8 @@ func gen_levels()
     }
 }
 
-class Next_Game
+// Window that prompts user to go to the next game if they win, or repeat if they loose
+class NextGameWindow
 {
     // create view that will hold next level
     var complete_container = UIView();
@@ -210,9 +202,8 @@ class Next_Game
         complete_container.addConstraint(centerx_next_level);
         complete_container.addConstraint(width_next_level);
         complete_container.addConstraint(height_next_level);
-        
-        
     }
+    // remove the window prompt
     func bring_down_window()
     {
         for(var i = 0; i < complete_container.subviews.count; ++i)
@@ -223,5 +214,3 @@ class Next_Game
         x_button.removeFromSuperview();
     }
 }
-
-
