@@ -10,6 +10,7 @@ import UIKit
 enum MINE_POLICY{case LOCAL, GLOBAL, MIXED};
 var levels = Array<Level>();
 let NUM_LEVELS = 125;
+let NUM_SUB_LEVELS = 25;
 let NUM_MEGA_LEVELS = 5;
 var VOLUME_LEVEL:Float = 1.0;
 
@@ -23,26 +24,28 @@ class Level:UIButton
     var dimension:Int = 4;
     var best_time:String = "N/A";
     var progress:Int = 0;
+    var difficulty:String = EASY;
     
-    override init()
+    init()
     {
-        super.init();
+        super.init(frame: CGRectZero);
     }
     required init(coder aDecoder: NSCoder)
     {
-        super.init();
+        super.init(frame: CGRectZero);
     }
     override init(frame: CGRect)
     {
         super.init(frame:frame);
     }
-    init(in_level:Int, in_speed:Int, in_policy:MINE_POLICY, in_dimension:Int)
+    init(in_level:Int, in_speed:Int, in_policy:MINE_POLICY, in_dimension:Int, in_difficulty:String)
     {
-        super.init();
+        super.init(frame: CGRectZero);
         self.dimension = in_dimension;
         self.policy = in_policy;
         self.level = in_level;
         self.speed = in_speed;
+        self.difficulty = in_difficulty;
     }
 }
 
@@ -56,7 +59,6 @@ func gen_levels()
         {
             // determine mine speed
             var speed = Int(ceil((Double(i)) / Double(NUM_SUB_LEVELS) * 10.0));
-            //println(speed);
             
             // determine mine policy
             var policy:MINE_POLICY;
@@ -75,8 +77,8 @@ func gen_levels()
                 // global policy
                 policy = MINE_POLICY.GLOBAL;
             }
-            var level_no = (mega * NUM_SUB_LEVELS) + i;
-            levels.append(Level(in_level: level_no, in_speed: speed, in_policy: policy, in_dimension: 4 + mega));
+            var level_no = i; // (mega * NUM_SUB_LEVELS) + i;
+            levels.append(Level(in_level: level_no, in_speed: speed, in_policy: policy, in_dimension: 4 + mega, in_difficulty: DIFFICULTY[mega]));
         }
     }
 }
@@ -154,12 +156,12 @@ class NextGameWindow
         if(won_game)
         {
             completed_label.textColor = UIColor.orangeColor();
-            completed_label.text = String(format: "Level %i Completed", current_level);
+            completed_label.text = String(format: "Level %i Completed", local_level);
         }
         else
         {
             completed_label.textColor = UIColor.redColor();
-            completed_label.text = String(format: "Level %i Failed", current_level);
+            completed_label.text = String(format: "Level %i Failed", local_level);
         }
         
         // add constraints
@@ -214,3 +216,17 @@ class NextGameWindow
         x_button.removeFromSuperview();
     }
 }
+
+func update_local_level()
+{
+    // update local level
+    local_level = (current_level + 1) % NUM_SUB_LEVELS;
+    if(local_level == 0)
+    {
+        local_level = 25; // handle case when level is multiple of 25
+    }
+    // update difficulty
+    var index:Int = current_level / NUM_SUB_LEVELS;
+    current_difficulty = DIFFICULTY[index];
+}
+

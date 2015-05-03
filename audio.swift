@@ -30,34 +30,33 @@ func play_sound(sound_effect:SOUND)
 {
     switch sound_effect
     {
-        case .EXPLORED:
-            explore_player = AVAudioPlayer(contentsOfURL: explored_sound_path, error: nil);
-            explore_player.volume = VOLUME_LEVEL;
-            explore_player.prepareToPlay();
-            explore_player.play();
-            break;
+    case .EXPLORED:
+        explore_player = AVAudioPlayer(contentsOfURL: explored_sound_path, error: nil);
+        explore_player.volume = VOLUME_LEVEL;
+        explore_player.prepareToPlay();
+        explore_player.play();
+        break;
         
-        case .DEFAULT:
-            default_player = AVAudioPlayer(contentsOfURL: default_sound_path, error: nil);
-            default_player.volume = VOLUME_LEVEL;
-            default_player.prepareToPlay();
-            default_player.play();
-            break;
+    case .DEFAULT:
+        default_player = AVAudioPlayer(contentsOfURL: default_sound_path, error: nil);
+        default_player.volume = VOLUME_LEVEL;
+        default_player.prepareToPlay();
+        default_player.play();
+        break;
         
-        case .WON:
-            won_player = AVAudioPlayer(contentsOfURL: won_sound_path, error: nil);
-            won_player.volume = VOLUME_LEVEL;
-            won_player.prepareToPlay();
-            won_player.play();
-            break;
+    case .WON:
+        won_player = AVAudioPlayer(contentsOfURL: won_sound_path, error: nil);
+        won_player.volume = VOLUME_LEVEL;
+        won_player.prepareToPlay();
+        won_player.play();
+        break;
         
-        case .LOST:
-            lost_player = AVAudioPlayer(contentsOfURL: lost_sound_path, error: nil);
-            lost_player.volume = VOLUME_LEVEL;
-            lost_player.prepareToPlay();
-            lost_player.play();
-            break;
+    case .LOST:
+        lost_player = AVAudioPlayer(contentsOfURL: lost_sound_path, error: nil);
+        lost_player.volume = VOLUME_LEVEL;
+        lost_player.prepareToPlay();
+        lost_player.play();
+        break;
         
     }
 }
-

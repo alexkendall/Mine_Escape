@@ -8,137 +8,61 @@
 
 import UIKit
 
-// created gradient on background view
-func configure_gradient(inout background:UIView, top_color:UIColor, bottom_color:UIColor)
-{
-    background.setTranslatesAutoresizingMaskIntoConstraints(false);
-    
-    // generate constraints for background
-    var width = NSLayoutConstraint(item: background, attribute: NSLayoutAttribute.Width, relatedBy: NSLayoutRelation.Equal, toItem: super_view, attribute: NSLayoutAttribute.Width, multiplier: 1.0, constant: 0.0);
-    
-    var height = NSLayoutConstraint(item: background, attribute: NSLayoutAttribute.Height, relatedBy: NSLayoutRelation.Equal, toItem: super_view, attribute: NSLayoutAttribute.Height, multiplier: 1.0, constant: 0.0);
-    
-    var centerx = NSLayoutConstraint(item: background, attribute: NSLayoutAttribute.CenterX, relatedBy: NSLayoutRelation.Equal, toItem: super_view, attribute: NSLayoutAttribute.CenterX, multiplier: 1.0, constant: 0.0);
-    
-    var centery = NSLayoutConstraint(item: background, attribute: NSLayoutAttribute.CenterY, relatedBy: NSLayoutRelation.Equal, toItem: super_view, attribute: NSLayoutAttribute.CenterY, multiplier: 1.0, constant: 0.0);
-    
-    super_view.addSubview(background);
-    super_view.addConstraint(width);
-    super_view.addConstraint(height);
-    super_view.addConstraint(centerx);
-    super_view.addConstraint(centery);
-    
-    var test_loc = [0,1];
-    var test_color = [top_color.CGColor, bottom_color.CGColor];
-    
-    var gradient = CAGradientLayer();
-    gradient.frame = super_view.bounds;
-    gradient.locations = test_loc;
-    gradient.colors = test_color;
-    gradient.startPoint = CGPoint(x: 0.5, y: 0.0);
-    gradient.endPoint = CGPoint(x: 0.5, y: 1.0);
-    background.layer.insertSublayer(gradient, atIndex: 0);
-    
-    super_view.addSubview(background);
-    super_view.addConstraint(width);
-    super_view.addConstraint(height);
-    super_view.addConstraint(centerx);
-    super_view.addConstraint(centery);
-}
+var EASY = "EASY", MEDIUM = "MEDIUM", HARD = "HARD", INSANE = "INSANE", IMPOSSIBLE = "IMPOSSIBLE";
+var DIFFICULTY:[String] = [EASY, MEDIUM, HARD, INSANE, IMPOSSIBLE];
 
-// adds back button to bottom left corner of view
-func add_back_button(inout back_button:UIButton, inout superview:UIView)
-{
-    // configure back button properties
-    var back_image = UIImage(named: "prev_level");
-    back_button.setTranslatesAutoresizingMaskIntoConstraints(false);
-    back_button.backgroundColor = UIColor.clearColor();
-    back_button.layer.borderWidth = 1.0;
-    back_button.layer.borderColor = UIColor.whiteColor().CGColor;
-    back_button.setBackgroundImage(back_image, forState: UIControlState.Normal);
-    
-    // configure back button constraints
-    
-    var back_margin:CGFloat = 10.0;
-    var back_length:CGFloat = 40.0;
-    
-    var back_left = NSLayoutConstraint(item:back_button, attribute: NSLayoutAttribute.Left, relatedBy: NSLayoutRelation.Equal, toItem: superview, attribute: NSLayoutAttribute.Left, multiplier: 1.0, constant: back_margin);
-    
-    var back_bottom = NSLayoutConstraint(item:back_button, attribute: NSLayoutAttribute.Bottom, relatedBy: NSLayoutRelation.Equal, toItem: superview, attribute: NSLayoutAttribute.Bottom, multiplier: 1.0, constant: -back_margin);
-    
-    var back_height = NSLayoutConstraint(item:back_button, attribute: NSLayoutAttribute.Top, relatedBy: NSLayoutRelation.Equal, toItem: back_button, attribute: NSLayoutAttribute.Bottom, multiplier: 1.0, constant: -back_length);
-    
-    var back_width = NSLayoutConstraint(item:back_button, attribute: NSLayoutAttribute.Width, relatedBy: NSLayoutRelation.Equal, toItem: back_button, attribute: NSLayoutAttribute.Height, multiplier: 1.0, constant: 0.0);
-    
-    // configure back button hiearchy
-    
-    superview.addSubview(back_button);
-    superview.addConstraint(back_left);
-    superview.addConstraint(back_bottom);
-    superview.addConstraint(back_height);
-    superview.addConstraint(back_width);
-    
-}
-
-// adds title label
-func add_title_button(inout title_label:UILabel, inout superview:UIView, text:String, margin:CGFloat, size:CGFloat)
-{
-    // configure title label properties
-    title_label.font = UIFont(name:"Arial", size: 30.0);
-    title_label.text = text;
-    title_label.textColor = UIColor.orangeColor();
-    title_label.textAlignment = NSTextAlignment.Center;
-    
-    var center = NSLayoutConstraint(item:title_label, attribute: NSLayoutAttribute.CenterX, relatedBy: NSLayoutRelation.Equal, toItem: superview, attribute: NSLayoutAttribute.CenterX, multiplier: 1.0, constant: 0.0);
-    
-    var width = NSLayoutConstraint(item:title_label, attribute: NSLayoutAttribute.Width, relatedBy: NSLayoutRelation.Equal, toItem: superview, attribute: NSLayoutAttribute.Width, multiplier: 1.0, constant: 0.0);
-    
-    var top = NSLayoutConstraint(item:title_label, attribute: NSLayoutAttribute.Top, relatedBy: NSLayoutRelation.Equal, toItem: superview, attribute: NSLayoutAttribute.Top, multiplier: 1.0, constant: margin);
-    
-    
-    
-    // configure back button hiearchy
-    
-    title_label.setTranslatesAutoresizingMaskIntoConstraints(false);
-    superview.addSubview(title_label);
-    superview.addConstraint(center);
-    superview.addConstraint(width);
-    superview.addConstraint(top);
-}
 
 class level_button:UIButton
 {
+    var difficulty:String;
     var level:Int;
     var progress:Int;
     var level_status_indicator = Array<UIView>();
-    override init()
+    init()
     {
         self.level = 0;
         self.progress = 0;
-        super.init();
+        self.difficulty = EASY;
+        super.init(frame:CGRectZero);
     }
     required init(coder aDecoder: NSCoder) {
         self.level = 0;
         self.progress = 0;
-        super.init();
+        self.difficulty = EASY;
+        super.init(frame:CGRectZero);
     }
     override init(frame: CGRect) {
         self.level = 0;
         self.progress = 0;
+        self.difficulty = EASY;
         super.init(frame: frame);
     }
-    init(in_level:Int, in_progress:Int)
+    init(in_level:Int, in_progress:Int, in_difficulty:String)
     {
+        self.difficulty = in_difficulty;
         self.level = in_level;
         self.progress = in_progress;
-        super.init();
+        super.init(frame:CGRectZero);
         self.level = in_level;
     }
     func update_progress()
     {
-        for(var i = 0; i < level_status_indicator.count; ++i)
+        var color = UIColor.clearColor();
+        if(progress == 3)
         {
-            level_status_indicator[i].backgroundColor = UIColor.greenColor();
+            color = UIColor.greenColor();
+        }
+        else if(progress == 2)
+        {
+            color = UIColor.yellowColor();
+        }
+        else if(progress == 1)
+        {
+            color = UIColor.redColor();
+        }
+        for(var i = 0; i < progress; ++i)
+        {
+            level_status_indicator[i].backgroundColor = color;
             level_status_indicator[i].layer.borderWidth = 0.5;
         }
     }
@@ -172,7 +96,7 @@ class Main_menu
     {
         configure_gradient(&background, UIColor.blackColor(), LIGHT_BLUE)
         background.setTranslatesAutoresizingMaskIntoConstraints(false);
-   
+        
         // insert title
         var baseline:CGFloat = 150.0;
         var title = UILabel();
@@ -200,6 +124,8 @@ class Main_menu
             background.addConstraint(center_mb_x);
             background.addConstraint(bottom_x);
         }
+        var subview:UIView = UIView();
+        subview.backgroundColor = UIColor.blackColor();
     }
 }
 
@@ -207,7 +133,7 @@ class HowToScreen
 {
     var background = UIView();
     var text = "Click all squares that do not contain mines." + " As you explore more squares, more mines will appear." +
-    " But beware, mines disappear  after a short amount of time. Red mines will be visible longer than blue mines." +
+        " But beware, mines disappear  after a short amount of time. Red mines will be visible longer than blue mines." +
     " You win once all squares not containing mines are explored.";
     var text_view = UITextView();
     var back_button = UIButton();
@@ -218,7 +144,7 @@ class HowToScreen
         
         var baseline_height:CGFloat = 75.0;
         var seperation:CGFloat = 50.0;
-
+        
         // generate constraints for text_view
         var width_tv = NSLayoutConstraint(item: text_view, attribute: NSLayoutAttribute.Width, relatedBy: NSLayoutRelation.Equal, toItem: background, attribute: NSLayoutAttribute.Width, multiplier: 0.75, constant: 0.0);
         
@@ -229,7 +155,7 @@ class HowToScreen
         var centery_tv = NSLayoutConstraint(item: text_view, attribute: NSLayoutAttribute.Top, relatedBy: NSLayoutRelation.Equal, toItem: background, attribute: NSLayoutAttribute.Top, multiplier: 1.0, constant: baseline_height + seperation);
         
         // generate title subview
-      
+        
         var title = UILabel();
         title.setTranslatesAutoresizingMaskIntoConstraints(false);
         var centerx_title = NSLayoutConstraint(item: title, attribute: NSLayoutAttribute.CenterX, relatedBy: NSLayoutRelation.Equal, toItem: background, attribute: NSLayoutAttribute.CenterX, multiplier: 1.0, constant: 0.0);
@@ -351,7 +277,7 @@ class settingsWindow
         
         var title = UILabel();
         add_title_button(&title, &background, "VOLUME", baseline_height, 30.0);
-
+        
         // configure volume slider
         volume_slider.setTranslatesAutoresizingMaskIntoConstraints(false);
         volume_slider.maximumValue = 1.0;
@@ -488,7 +414,7 @@ class LevelMenu
             var current_dim = 4 + i;
             tab.backgroundColor = UIColor.whiteColor();
             tab.setTranslatesAutoresizingMaskIntoConstraints(false);
-            tab.text = String(format: "%i X %i", current_dim, current_dim);
+            tab.text = DIFFICULTY[i]; //+ String(format: " - %i X %i ", current_dim, current_dim);
             tab.textAlignment = NSTextAlignment.Center;
             tab.textColor = UIColor.blackColor();
             tabs.append(tab);
@@ -516,7 +442,8 @@ class LevelMenu
                 for(var col = 0; col < dimension; ++col)
                 {
                     // configure level button properties
-                    var level_but:level_button = level_button(in_level: (i * (NUM_SUB_LEVELS)) + (dimension * row) + col, in_progress: 0);
+                    //var level_but:level_button = level_button(in_level: (i * (NUM_SUB_LEVELS)) + (dimension * row) + col, in_progress: 0);
+                    var level_but:level_button = level_button(in_level: (row * dimension) + col + 1, in_progress: 0, in_difficulty:DIFFICULTY[i]);
                     level_but.backgroundColor = UIColor(red: 0.0, green: 0.0, blue: 0.0, alpha: 0.75);
                     level_but.layer.borderWidth = 1.0;
                     level_but.layer.borderColor = UIColor.whiteColor().CGColor;
@@ -542,20 +469,20 @@ class LevelMenu
                     scroll_view.addConstraint(level_height);
                     level_buttons.append(level_but);
                     
-                    for(var j = 0; j < 1; ++j)  // generate status
+                    for(var j = 0; j < 3; ++j)  // generate status
                     {
                         var level_status = UIView();
                         level_status.setTranslatesAutoresizingMaskIntoConstraints(false);
                         level_status.backgroundColor = UIColor.clearColor();
                         
-                        var num_cols = 5;
-                        var left_const = super_view.frame.width / CGFloat(num_cols) / 3.0 * CGFloat(j);
+                        //var num_cols = 5.0;
+                        var width:CGFloat = super_view.frame.width * scroll_mult / 5.0 / 3.0;
                         
                         var status_height_constr = NSLayoutConstraint(item: level_status, attribute: NSLayoutAttribute.Height, relatedBy: NSLayoutRelation.Equal, toItem: level_but, attribute: NSLayoutAttribute.Height, multiplier: 0.15, constant: 0.0);
                         
-                        var status_width_constr = NSLayoutConstraint(item: level_status, attribute: NSLayoutAttribute.Width, relatedBy: NSLayoutRelation.Equal, toItem: level_but, attribute: NSLayoutAttribute.Width, multiplier: 1.0, constant: 0.0);
+                        var status_width_constr = NSLayoutConstraint(item: level_status, attribute: NSLayoutAttribute.Width, relatedBy: NSLayoutRelation.Equal, toItem: level_but, attribute: NSLayoutAttribute.Width, multiplier: 1.0 / 3.0, constant: 0.0);
                         
-                        var status_left = NSLayoutConstraint(item: level_status, attribute: NSLayoutAttribute.Left, relatedBy: NSLayoutRelation.Equal, toItem: level_but, attribute: NSLayoutAttribute.Left, multiplier: 1.0, constant: left_const);
+                        var status_left = NSLayoutConstraint(item: level_status, attribute: NSLayoutAttribute.Left, relatedBy: NSLayoutRelation.Equal, toItem: level_but, attribute: NSLayoutAttribute.Left, multiplier: 1.0, constant: width * CGFloat(j));
                         
                         var status_bottom = NSLayoutConstraint(item: level_status, attribute: NSLayoutAttribute.Bottom, relatedBy: NSLayoutRelation.Equal, toItem: level_but, attribute: NSLayoutAttribute.Bottom, multiplier: 1.0, constant: 0.0);
                         
@@ -570,9 +497,14 @@ class LevelMenu
             }
             
         }
+        for(var i = 0; i < levels.count; ++i)
+        {
+            level_buttons[i].progress = levels[i].progress;
+            level_buttons[i].difficulty = levels[i].difficulty;
+            level_buttons[i].update_progress();
+        }
         add_back_button(&back_button, &background);
         add_title_button(&title, &background, "Levels", 15.0, 30.0);
         scroll_view.scrollEnabled = true;
     }
 }
-

@@ -33,7 +33,7 @@ let NUM_SPEEDS:Int = 10;
 
 class Mine_cell:UIButton
 {
-
+    
     var loc_id:Int;
     var mine_exists:Bool = false;
     var insignia:String = "";
@@ -42,33 +42,14 @@ class Mine_cell:UIButton
     var timer = NSTimer();
     var timer_running:Bool = false;
     var speed:SPEED;
-    
-    override init()
-    {
-        loc_id = -1;
-        mine_exists = false;
-        insignia = "";
-        explored = false;
-        timer_running = false;
-        speed = SPEED.SLOW;
-        super.init();
-    }
+
     required init(coder aDecoder: NSCoder) {
         loc_id = -1;
         mine_exists = false;
         insignia = "";
         explored = false;
         speed = SPEED.SLOW;
-        super.init();
-    }
-    override init(frame: CGRect) {
-        loc_id = -1;
-        explored = false;
-        mine_exists = false;
-        insignia = "";
-        timer_running = false;
-        speed = SPEED.SLOW;
-        super.init(frame: frame);
+        super.init(frame:CGRectZero);
     }
     init(location_identifier:Int)
     {
@@ -78,7 +59,7 @@ class Mine_cell:UIButton
         insignia = "";
         timer_running = false;
         speed = SPEED.SLOW;
-        super.init();
+        super.init(frame:CGRectZero);
         loc_id = location_identifier;
     }
     func set_image(var name:String)
@@ -102,9 +83,9 @@ class Mine_cell:UIButton
                 case 1:
                     set_image("mine_yellow");
                 case 0:
-                    imageView?.image = nil;
+                    setImage(nil, forState: UIControlState.Normal);
                 default:
-                    set_image("mine_black");
+                    setImage(nil, forState: UIControlState.Normal);
                 }
             }
             else if(speed == SPEED.FAST)
@@ -118,9 +99,9 @@ class Mine_cell:UIButton
                 case 1:
                     set_image("mine_light_blue");
                 case 0:
-                    imageView?.image = nil;
+                    setImage(nil, forState: UIControlState.Normal);
                 default:
-                    set_image("mine_black");
+                    setImage(nil, forState: UIControlState.Normal);
                 }
             }
         }
@@ -130,6 +111,7 @@ class Mine_cell:UIButton
             setTitleColor(UIColor.clearColor(), forState: UIControlState.Normal);
             imageView?.image = nil;
             timer_running = false;
+            setBackgroundImage(nil, forState: UIControlState.Normal);
         }
     }
     func mark_mine()
@@ -143,13 +125,13 @@ class Mine_cell:UIButton
             if(speed == SPEED.SLOW)
             {
                 time_til_disappears = 4;
-                timer = NSTimer.scheduledTimerWithTimeInterval(1.0, target: self, selector: "update", userInfo: nil, repeats: true);
+                timer = NSTimer.scheduledTimerWithTimeInterval(0.5, target: self, selector: "update", userInfo: nil, repeats: true);
                 timer_running = true;
             }
             else if(speed == SPEED.FAST)
             {
                 time_til_disappears = 4;
-                timer = NSTimer.scheduledTimerWithTimeInterval(0.25, target: self, selector: "update", userInfo: nil, repeats: true);
+                timer = NSTimer.scheduledTimerWithTimeInterval(0.125, target: self, selector: "update", userInfo: nil, repeats: true);
                 timer_running = true;
             }
         }
@@ -181,13 +163,15 @@ class GameMap
     var MINE_SPEED:Int;
     var POLICY:MINE_POLICY;
     var level_indicator:UILabel = UILabel();
+    var difficulty_indicator = UILabel();
     var level_no:Int = 0;
-
+    
+    
     // labels
     var bottom_text = UILabel();
-
+    
     // buttons
-    var size_buttons = Array<UIButton>();
+    //var size_buttons = Array<UIButton>();
     var startup_menu = UIButton();
     var prev_button = UIButton();
     var next_button = UIButton();
@@ -201,42 +185,24 @@ class GameMap
             map[i].removeFromSuperview();
         }
         bottom_text.removeFromSuperview();
-        for(var i = 0; i < size_buttons.count; ++i)
-        {
-            size_buttons[i].removeFromSuperview();
-        }
         level_button.removeFromSuperview();
         level_indicator.removeFromSuperview();
         startup_menu.removeFromSuperview();
         repeat_button.removeFromSuperview();
         prev_button.removeFromSuperview();
         next_button.removeFromSuperview();
+        difficulty_indicator.removeFromSuperview();
     }
     
     func create_game(rows:Int, cols:Int)
     {
-        /*
-        explosion_player = AVAudioPlayer(contentsOfURL: mine_explosion, error: nil);
-        explosion_player.prepareToPlay();
-        
-        won_game_player = AVAudioPlayer(contentsOfURL: won_game_sound_path, error: nil);
-        won_game_player.prepareToPlay();
-        
-        explore_player = AVAudioPlayer(contentsOfURL: explore_sound_path, error: nil);
-        explore_player.prepareToPlay();
-        
-        explore_player.volume = VOLUME_LEVEL;
-        won_game_player.volume = VOLUME_LEVEL;
-        explosion_player.volume = VOLUME_LEVEL;
-        */
-        
         NUM_ROWS = rows;
         NUM_COLS = cols;
         NUM_LOCS = rows * cols;
         map.removeAll(keepCapacity: true);
         COUNT = 0;
         GAME_OVER = false;
-        START_LOC = 0; // Int(floor(Float(NUM_LOCS) / 2.0));
+        START_LOC = 0;
         GAME_STARTED = false;
         
         var margin_height = (super_view.bounds.height - super_view.bounds.width) / 2.0;
@@ -257,13 +223,13 @@ class GameMap
                 var width = NSLayoutConstraint(item: subview, attribute: NSLayoutAttribute.Width, relatedBy: NSLayoutRelation.Equal, toItem: super_view, attribute: NSLayoutAttribute.Width, multiplier: width_const, constant: 0.0);
                 
                 var height = NSLayoutConstraint(item: subview, attribute: NSLayoutAttribute.Height, relatedBy: NSLayoutRelation.Equal, toItem: subview, attribute: NSLayoutAttribute.Width, multiplier: 1.0, constant: 0.0);
-    
+                
                 var increment_centerx:CGFloat  = (CGFloat(super_view.bounds.width) / CGFloat(NUM_COLS) * 0.5) + (CGFloat(super_view.bounds.width) / CGFloat(NUM_COLS) * CGFloat(col));
                 
                 var increment_x = NSLayoutConstraint(item: subview, attribute: NSLayoutAttribute.CenterX, relatedBy: NSLayoutRelation.Equal, toItem: super_view, attribute: NSLayoutAttribute.Left, multiplier: 1.0, constant: increment_centerx);
                 
                 var increment_centery:CGFloat  = (super_view.bounds.width / CGFloat(NUM_ROWS) * 0.5) + (super_view.bounds.width / CGFloat(NUM_ROWS) * CGFloat(row));
-
+                
                 var increment_y = NSLayoutConstraint(item: subview, attribute: NSLayoutAttribute.CenterY, relatedBy: NSLayoutRelation.Equal, toItem: super_view, attribute: NSLayoutAttribute.Top, multiplier: 1.0, constant: increment_centery + margin_height);
                 
                 subview.backgroundColor = UIColor.whiteColor();
@@ -276,15 +242,14 @@ class GameMap
                 // tag element to uniquely identify it
                 subview.tag = (row * NUM_COLS) + col;
                 var tag:Int = (row * NUM_COLS) + col;
-                //subview.addTarget(super_view, action: "pressed_loc:", forControlEvents: UIControlEvents.TouchDown);
                 self.map.append(subview);
-                //self.map[tag].addTarget(self, action: "pressed_loc:", forControlEvents: UIControlEvents.TouchDown);
             }
         }
         self.map[self.START_LOC].backgroundColor = UIColor.grayColor();
         self.map[self.START_LOC].setTitleColor(UIColor.blackColor(), forState: UIControlState.Normal);
         self.map[self.START_LOC].setTitle("START", forState: UIControlState.Normal);
         
+        var font_size:CGFloat = 12.0 + ((8.0 - CGFloat(NUM_ROWS)) * 2.0);
         if(NUM_ROWS > 6)
         {
             self.map[self.START_LOC].titleLabel?.font = UIFont(name: "Arial-BoldMT" , size: 12.0);
@@ -297,6 +262,7 @@ class GameMap
         {
             self.map[self.START_LOC].titleLabel?.font = UIFont(name: "Arial-BoldMT" , size: 18.0);
         }
+        
         super_view.layer.borderWidth = 2.0;
         super_view.layer.borderColor = UIColor.blackColor().CGColor
         
@@ -340,43 +306,38 @@ class GameMap
         
         super_view.addConstraint(main_menu_offset_x);
         super_view.addConstraint(main_offsety_menu);
+        update_local_level();
         
+        difficulty_indicator.setTranslatesAutoresizingMaskIntoConstraints(false);
+        super_view.addSubview(difficulty_indicator);
+        var off_const:CGFloat = 20.0
+        var csy = NSLayoutConstraint(item: difficulty_indicator, attribute: NSLayoutAttribute.Bottom, relatedBy: NSLayoutRelation.Equal, toItem: super_view, attribute: NSLayoutAttribute.Bottom, multiplier: 1.0, constant: -20.0);
         
-        for(var i = 0; i < NUM_MEGA_LEVELS; ++i)
-        {
-            var size_button = UIButton();
-            size_button.setTranslatesAutoresizingMaskIntoConstraints(false);
-            super_view.addSubview(size_button);
-            
-            var off_const:CGFloat = 20.0 + (40.0 * CGFloat(i));
-            
-            var csy = NSLayoutConstraint(item: size_button, attribute: NSLayoutAttribute.Bottom, relatedBy: NSLayoutRelation.Equal, toItem: super_view, attribute: NSLayoutAttribute.Bottom, multiplier: 1.0, constant: -20.0);
-            
-            
-            var offset_right = NSLayoutConstraint(item: size_button, attribute: NSLayoutAttribute.Right, relatedBy: NSLayoutRelation.Equal, toItem: super_view, attribute: NSLayoutAttribute.Right, multiplier: 1.0, constant: -off_const);
-            
-            var num = 8 - i;
-            var dim_str = String(format: "%ix%i", num, num);
-            size_button.setTitle(dim_str, forState: UIControlState.Normal);
-            size_button.setTitleColor(UIColor.whiteColor(), forState: UIControlState.Normal);
-            size_button.tag = num;
-            
-            
-            super_view.addConstraint(offset_right);
-            super_view.addConstraint(csy);
-            size_buttons.append(size_button);
-        }
+        var offset_right = NSLayoutConstraint(item: difficulty_indicator, attribute: NSLayoutAttribute.Right, relatedBy: NSLayoutRelation.Equal, toItem: super_view, attribute: NSLayoutAttribute.Right, multiplier: 1.0, constant: -off_const);
         
         level_indicator.setTranslatesAutoresizingMaskIntoConstraints(false);
         super_view.addSubview(level_indicator);
         
-        var centery_li = NSLayoutConstraint(item: level_indicator, attribute: NSLayoutAttribute.CenterY, relatedBy: NSLayoutRelation.Equal, toItem: size_buttons[0], attribute: NSLayoutAttribute.CenterY, multiplier: 1.0, constant: 0.0);
+        difficulty_indicator.text = current_difficulty;
+        switch current_difficulty
+        {
+            case EASY: difficulty_indicator.textColor = UIColor.greenColor();
+            case MEDIUM: difficulty_indicator.textColor = UIColor.yellowColor();
+            case HARD: difficulty_indicator.textColor = UIColor.orangeColor();
+            case INSANE: difficulty_indicator.textColor = UIColor.whiteColor();
+        case IMPOSSIBLE: difficulty_indicator.textColor = UIColor.redColor();
+            default: println("ERROR: Difficulty should be a color");
+        }
+        super_view.addConstraint(offset_right);
+        super_view.addConstraint(csy);
+        
+        var centery_li = NSLayoutConstraint(item: level_indicator, attribute: NSLayoutAttribute.CenterY, relatedBy: NSLayoutRelation.Equal, toItem: difficulty_indicator, attribute: NSLayoutAttribute.CenterY, multiplier: 1.0, constant: 0.0);
         
         var offset_left_li = NSLayoutConstraint(item: level_indicator, attribute: NSLayoutAttribute.Left, relatedBy: NSLayoutRelation.Equal, toItem: super_view, attribute: NSLayoutAttribute.Left, multiplier: 1.0, constant: 20.0);
         
         super_view.addConstraint(centery_li);
         super_view.addConstraint(offset_left_li);
-        level_indicator.text = String(format:"LEVEL %i", current_level);
+        level_indicator.text = String(format:"LEVEL %i", local_level);
         level_indicator.textColor = LIGHT_BLUE;
         
         
@@ -397,7 +358,7 @@ class GameMap
         var centerx_repeat = NSLayoutConstraint(item: repeat_button, attribute: NSLayoutAttribute.CenterX, relatedBy: NSLayoutRelation.Equal, toItem: super_view, attribute: NSLayoutAttribute.CenterX, multiplier: 1.0, constant: 0.0);
         
         var centery_repeat = NSLayoutConstraint(item: repeat_button, attribute: NSLayoutAttribute.Top, relatedBy: NSLayoutRelation.Equal, toItem: map[map.count - 1], attribute: NSLayoutAttribute.Bottom, multiplier: 1.0, constant: 15.0);
-    
+        
         var width_repeat = NSLayoutConstraint(item: repeat_button, attribute: NSLayoutAttribute.Right, relatedBy: NSLayoutRelation.Equal, toItem: repeat_button, attribute: NSLayoutAttribute.Left, multiplier: 1.0, constant: button_width);
         
         var height_repeat = NSLayoutConstraint(item: repeat_button, attribute: NSLayoutAttribute.Top, relatedBy: NSLayoutRelation.Equal, toItem: repeat_button, attribute: NSLayoutAttribute.Bottom, multiplier: 1.0, constant: -button_width);
@@ -431,7 +392,7 @@ class GameMap
         super_view.addConstraint(centery_prev);
         super_view.addConstraint(width_prev);
         super_view.addConstraint(height_prev);
-
+        
         // create next button
         next_button.setTranslatesAutoresizingMaskIntoConstraints(false);
         next_button.setBackgroundImage(next_image, forState: UIControlState.Normal);
@@ -563,6 +524,7 @@ class GameMap
         ++COUNT;
     }
     
+    // MARKS GAME ACCORDINGLY IF WON OR LOST AND INVALIDATES ALL TIMERS
     func end_game()
     {
         for(var i = 0; i < NUM_LOCS; ++i)
@@ -579,7 +541,7 @@ class GameMap
                 {
                     map[i].backgroundColor = UIColor.redColor();
                 }
-
+                
             }
         }
     }
@@ -652,10 +614,32 @@ class GameMap
     
     func mark_completed()
     {
+        var proportion:Float = Float(COUNT) / Float(NUM_LOCS);
+        if(proportion == 1.0)
+        {
+            levels[current_level].progress = 3;
+        }
+        else if(proportion >= 0.80)
+        {
+            if (levels[current_level].progress < 2)
+            {
+                levels[current_level].progress = 2;
+            }
+        }
+        else if(proportion > 0.50)
+        {
+            if(levels[current_level].progress < 1)
+            {
+                levels[current_level].progress = 1;
+            }
+        }
+        /*
         if(find(levels_completed, current_level) == nil)
         {
             levels_completed.append(current_level);
         }
+        */
+        //if(levels[current_level].progress < current)
     }
     
     func mark_location(var loc_id:Int)
@@ -669,7 +653,6 @@ class GameMap
                 mark_location(loc_id);
                 map[loc_id].explored = true;
                 play_sound(SOUND.EXPLORED);
-                
                 // begin game timer
             }
         }
@@ -678,8 +661,9 @@ class GameMap
             if(map[loc_id].mine_exists)
             {
                 play_sound(SOUND.LOST);
-            
+                
                 // game is over
+                mark_completed();
                 GAME_OVER = true;
                 end_game();
                 map[loc_id].setTitleColor(UIColor.redColor(), forState: UIControlState.Normal);
@@ -701,7 +685,6 @@ class GameMap
                     
                     self.bottom_text.textColor = LIGHT_BLUE;
                     mark_completed();
-                    println("leve")
                     GAME_OVER = true;
                     end_game();
                     next_game_win.won_game = true;
@@ -715,6 +698,7 @@ class GameMap
             }
         }
     }
+    
 }
 
 //-------------------------------------------------------------------------
